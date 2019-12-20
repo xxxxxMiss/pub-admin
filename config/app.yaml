@@ -1,0 +1,42 @@
+# you can add comments in yaml, but not permitted in json
+debug: true
+app_name_en: publish_manager
+app_name_cn: 发布管理系统
+port: 3000
+# cookie's key
+app_auth:
+  cookie_name: 'qsch_forum'
+  jwt_secret: 'qsch_forum'
+# upload
+upload:
+  path: /public/upload
+# session
+session:
+  secret: qsch_forum
+  key: qsch_forum
+  # 1min
+  maxAage: 6000000
+mongodb: mongodb://127.0.0.1:27017/publish_manager
+
+# github login config
+github_oauth:
+  clientID: 7212a5f9c55ee738835e
+  clientSecret: ef3f7f4f5dfc506ea3aa2da2b40b6db5071ab78a
+  callbackURL: http://127.0.0.1:3000/auth/github/callback
+  passReqToCallback: true
+
+weibo_oauth:
+  # App Key
+  clientID: 2821978811
+  # App Secret
+  clientSecret: 42d86dc209da12cb2c981d7268f1d4e6
+  callbackURL: http://127.0.0.1:3000/auth/weibo/callback
+
+# config mail
+mail_opts:
+  host: smtp.qq.com
+  port: 465
+  auth:
+    secure: true
+    user: 794465731@qq.com
+    pass: zmuxzvvhdotvbcch

@@ -2,6 +2,8 @@ const next = require('next')
 const Koa = require('koa')
 const Router = require('koa-router')
 
+const userModel = require('../models/user')
+
 const port = process.env.PORT || 3000
 const dev = process.env.NODE_ENV != 'production'
 const app = next({ dev })
@@ -17,10 +19,19 @@ app.prepare().then(() => {
   })
 
   router.get('/api/login', async ctx => {
-    console.log('--ctx query: ', ctx.query)
-    ctx.status = 200
-    ctx.body = {
-      code: 0
+    const query = ctx.query
+    if (query.name != 'admin') {
+      ctx.status = 200
+      ctx.body = {
+        code: 'USER_INVALID',
+        message: '当前用户无权限访问'
+      }
+    } else {
+      userModel.create(query)
+      ctx.status = 200
+      ctx.body = {
+        code: 0
+      }
     }
   })
 

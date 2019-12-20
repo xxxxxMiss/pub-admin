@@ -1,14 +1,24 @@
-import { Form, Icon, Input, Button, Checkbox } from 'antd'
+import { Form, Icon, Input, Button, Checkbox, notification } from 'antd'
 import axios from 'axios'
+import { useRouter } from 'next/router'
 
 function NormalLoginForm(props) {
+  const router = useRouter()
+
   function handleSubmit(e) {
     e.preventDefault()
     props.form.validateFields((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values)
         axios.get('/api/login', { params: values }).then(res => {
-          console.log('---res---', res)
+          const { code, message } = res.data
+          if (code != 0) {
+            return notification.open({
+              message: '登录提醒',
+              description: message
+            })
+          }
+          router.replace('/index')
         })
       }
     })
@@ -17,25 +27,25 @@ function NormalLoginForm(props) {
   const { getFieldDecorator } = props.form
   return (
     <div className="page-login">
-      <Form onSubmit={handleSubmit} className="login-form">
+      <Form labelAlign="left" onSubmit={handleSubmit} className="login-form">
         <Form.Item>
-          {getFieldDecorator('username', {
-            rules: [{ required: true, message: 'Please input your username!' }]
+          {getFieldDecorator('name', {
+            rules: [{ required: true, message: '请输入用户名' }]
           })(
             <Input
               prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-              placeholder="Username"
+              placeholder="用户名"
             />
           )}
         </Form.Item>
         <Form.Item>
           {getFieldDecorator('password', {
-            rules: [{ required: true, message: 'Please input your Password!' }]
+            rules: [{ required: true, message: '请输入密码' }]
           })(
             <Input
               prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
               type="password"
-              placeholder="Password"
+              placeholder="密码"
             />
           )}
         </Form.Item>
@@ -43,29 +53,25 @@ function NormalLoginForm(props) {
           {getFieldDecorator('remember', {
             valuePropName: 'checked',
             initialValue: true
-          })(<Checkbox>Remember me</Checkbox>)}
-          <a className="login-form-forgot" href="">
+          })(<Checkbox>记住我</Checkbox>)}
+          {/* <a className="login-form-forgot" href="">
             Forgot password
-          </a>
+          </a> */}
           <Button
             type="primary"
             htmlType="submit"
             className="login-form-button"
           >
-            Log in
+            登录
           </Button>
-          Or <a href="">register now!</a>
         </Form.Item>
       </Form>
       <style jsx global>{`
         .page-login {
           display: flex;
-          align-items: center;
           justify-content: center;
+          align-items: center;
           text-align: center;
-        }
-        .login-form {
-          color: red;
         }
       `}</style>
     </div>
