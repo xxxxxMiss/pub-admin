@@ -11,7 +11,6 @@ export default function Index(props) {
   return (
     <Layout>
       <Sider trigger={null} collapsible collapsed={collapsed}>
-        <div className="logo" />
         <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
           <Menu.Item key="1">
             <Icon type="user" />
@@ -28,7 +27,7 @@ export default function Index(props) {
         </Menu>
       </Sider>
       <Layout>
-        <Header style={{ background: '#fff', padding: 0 }}>
+        <Header style={{ background: '#fff', padding: '0 24px' }}>
           <Icon
             className="trigger"
             type={collapsed ? 'menu-unfold' : 'menu-fold'}

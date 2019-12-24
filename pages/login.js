@@ -72,6 +72,7 @@ function NormalLoginForm(props) {
           justify-content: center;
           align-items: center;
           text-align: center;
+          height: 100%;
         }
       `}</style>
     </div>

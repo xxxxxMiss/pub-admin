@@ -4,7 +4,7 @@ const Router = require('koa-router')
 
 const userModel = require('../models/user')
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 8090
 const dev = process.env.NODE_ENV != 'production'
 const app = next({ dev })
 const handle = app.getRequestHandler()
@@ -27,7 +27,7 @@ app.prepare().then(() => {
         message: '当前用户无权限访问'
       }
     } else {
-      userModel.create(query)
+      // userModel.create(query)
       ctx.status = 200
       ctx.body = {
         code: 0
