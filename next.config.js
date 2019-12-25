@@ -1,11 +1,22 @@
-const { PHASE_DEVELOPMENT_SERVER } = require('next/constants')
+/* eslint-disable */
+const withLess = require('@zeit/next-less')
+const lessToJS = require('less-vars-to-js')
+const fs = require('fs')
+const path = require('path')
 
-const withCss = require('@zeit/next-css')
+// Where your antd-custom.less file lives
+const themeVariables = lessToJS(
+  fs.readFileSync(path.resolve(__dirname, './assets/antd-custom.less'), 'utf8')
+)
 
-const cssConfig = withCss({
+module.exports = withLess({
+  lessLoaderOptions: {
+    javascriptEnabled: true,
+    modifyVars: themeVariables // make your antd custom effective
+  },
   webpack: (config, { isServer }) => {
     if (isServer) {
-      const antStyles = /antd\/.*?\/style\/css.*?/
+      const antStyles = /antd\/.*?\/style.*?/
       const origExternals = [...config.externals]
       config.externals = [
         (context, request, callback) => {
@@ -24,14 +35,48 @@ const cssConfig = withCss({
         use: 'null-loader'
       })
     }
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@js': path.join(__dirname, 'assets/js')
+    }
     return config
   }
 })
 
-module.exports = (phase, { defaultConfig }) => {
-  return {
-    ...defaultConfig,
-    ...cssConfig
-    // useFileSystemPublicRoutes: false
-  }
-}
+// const { PHASE_DEVELOPMENT_SERVER } = require('next/constants')
+
+// const withCss = require('@zeit/next-css')
+
+// const cssConfig = withCss({
+//   webpack: (config, { isServer }) => {
+//     if (isServer) {
+//       const antStyles = /antd\/.*?\/style\/css.*?/
+//       const origExternals = [...config.externals]
+//       config.externals = [
+//         (context, request, callback) => {
+//           if (request.match(antStyles)) return callback()
+//           if (typeof origExternals[0] === 'function') {
+//             origExternals[0](context, request, callback)
+//           } else {
+//             callback()
+//           }
+//         },
+//         ...(typeof origExternals[0] === 'function' ? [] : origExternals)
+//       ]
+
+//       config.module.rules.unshift({
+//         test: antStyles,
+//         use: 'null-loader'
+//       })
+//     }
+//     return config
+//   }
+// })
+
+// module.exports = (phase, { defaultConfig }) => {
+//   return {
+//     ...defaultConfig,
+//     ...cssConfig
+//     // useFileSystemPublicRoutes: false
+//   }
+// }
