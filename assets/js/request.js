@@ -9,7 +9,7 @@ const instance = axios.create({
 
 instance.interceptors.response.use(
   res => {
-    const { code, data = {}, msg } = res.data
+    const { code, data = {}, message: msg } = res.data
     if (code == 0) {
       return data
     }

@@ -16,11 +16,6 @@ app.prepare().then(() => {
 
   server.use(bodyParser())
 
-  router.get('/a', async ctx => {
-    await app.render(ctx.req, ctx.res, '/a', ctx.query)
-    ctx.respond = false
-  })
-
   dispatchRouter(router)
 
   router.all('*', async ctx => {

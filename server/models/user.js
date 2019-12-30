@@ -8,7 +8,12 @@ const schema = new Schema({
   },
   password: {
     type: String
-  }
+  },
+  createTime: {
+    type: Date,
+    default: Date.now()
+  },
+  phone: String
 })
 
 module.exports = mongoose.model('User', schema)
