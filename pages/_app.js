@@ -1,13 +1,9 @@
 import React from 'react'
 import App from 'next/app'
-
+import { Menu, Icon, Layout, Slider, Button } from 'antd'
+import { post } from '@js/request'
 import './_app.less'
 
-import Link from 'next/link'
-import CardList from '../components/CardList'
-import axios from 'axios'
-import { Menu, Icon, Layout, Slider } from 'antd'
-import { useState } from 'react'
 const { Header, Content, Sider } = Layout
 const { SubMenu } = Menu
 
@@ -26,6 +22,13 @@ class MyApp extends App {
 
   state = {
     collapsed: false
+  }
+
+  logout = async () => {
+    const res = await post('/api/logout')
+    if (res) {
+      // router navigation
+    }
   }
 
   render() {
@@ -60,7 +63,7 @@ class MyApp extends App {
                 })
               }
             />
-            <div className="test">1111</div>
+            <Button onClick={this.logout}>退出</Button>
           </Header>
           <Content
             style={{

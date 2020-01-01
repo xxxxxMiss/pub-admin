@@ -10,9 +10,9 @@ exports.createApplication = async ctx => {
 
 exports.getList = async ctx => {
   const params = ctx.query
-  const list = await getList(params)
+  const data = await getList(params)
   ctx.body = {
     code: 0,
-    data: list
+    data: { ...data }
   }
 }

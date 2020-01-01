@@ -23,9 +23,18 @@ exports.login = async ctx => {
     return
   }
 
+  ctx.session.user = userinfo
+
   ctx.body = {
     code: 0,
     data: userinfo
+  }
+}
+
+exports.logout = async ctx => {
+  ctx.session.user = null
+  ctx.body = {
+    code: 0
   }
 }
 
@@ -49,5 +58,29 @@ exports.register = async ctx => {
     } else {
       throw error
     }
+  }
+}
+
+exports.collectApplication = async ctx => {
+  const user = ctx.session.user
+  const userDoc = await getUserByName(user.name)
+
+  const collections = userDoc.collectAppications
+  for (let i = 0; i < collections.length; i++) {
+    if (collections[i] === ctx.request.body.appid) {
+      collections.splice(i, 1)
+      userDoc.save()
+      ctx.body = {
+        code: 0,
+        message: '取消收藏'
+      }
+      return
+    }
+  }
+  collections.push(ctx.request.body.appid)
+  userDoc.save()
+  ctx.body = {
+    code: 0,
+    message: '收藏成功'
   }
 }

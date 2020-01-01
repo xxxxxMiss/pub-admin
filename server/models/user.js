@@ -13,7 +13,8 @@ const schema = new Schema({
     type: Date,
     default: Date.now()
   },
-  phone: String
+  phone: String,
+  collectAppications: [Schema.Types.ObjectId]
 })
 
 module.exports = mongoose.model('User', schema)

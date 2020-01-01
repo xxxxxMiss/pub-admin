@@ -1,4 +1,9 @@
-const { login, register } = require('./controller/user')
+const {
+  login,
+  logout,
+  register,
+  collectApplication
+} = require('./controller/user')
 const { createApplication, getList } = require('./controller/application')
 
 module.exports = router => {
@@ -6,4 +11,6 @@ module.exports = router => {
   router.post('/api/create-application', createApplication)
   router.get('/api/get-applications', getList)
   router.post('/api/register', register)
+  router.post('/api/collect-application', collectApplication)
+  router.post('/api/logout', logout)
 }

@@ -1,19 +1,45 @@
 import { useState, useEffect } from 'react'
-import { Button, Drawer, Form, Col, Row, Input, message, Table } from 'antd'
+import {
+  Button,
+  Drawer,
+  Form,
+  Col,
+  Row,
+  Input,
+  message,
+  Table,
+  Checkbox
+} from 'antd'
 import { get, post } from '@js/request'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { useRouter } from 'next/router'
+
+async function handleCollecton(appid) {
+  const res = await post('/api/collect-application', { appid })
+  if (res) {
+    message.success('收藏成功')
+  }
+}
 
 const columns = [
   {
     title: '应用名称',
     dataIndex: 'appName',
     sorter: true,
-    width: '20%'
+    width: '20%',
+    render: (text, record) => {
+      return (
+        <>
+          <Button onClick={() => handleCollecton(record._id)}>收藏</Button>
+          <span>{text}</span>
+        </>
+      )
+    }
   },
   {
     title: 'Git地址',
     dataIndex: 'appGitAddr',
+    sorter: true,
     render: text => {
       return (
         <CopyToClipboard onCopy={() => message.success('复制成功')} text={text}>
@@ -46,36 +72,44 @@ export default function Application(props) {
   }
 
   const [data, setData] = useState(props.data || [])
-  const [pagination, setPagination] = useState({})
+  const [pagination, setPagination] = useState(props.pagination)
 
-  function getData() {
-    get('api/get-applications').then(res => {
+  function getData(params) {
+    get('api/get-applications', {
+      params
+    }).then(res => {
       if (res) {
-        setData(res)
+        setData(res.list)
       }
     })
   }
 
-  function handleTableChange(pagination, filters, sorter) {
-    const pager = { ...this.state.pagination }
-    pager.current = pagination.current
-    this.setState({
-      pagination: pager
-    })
-    getData({
-      results: pagination.pageSize,
-      page: pagination.current,
-      sortField: sorter.field,
-      sortOrder: sorter.order,
-      ...filters
-    })
+  function handleTableChange(paginationCfg, _, sorter) {
+    console.log('=====', sorter)
+    setPagination(prev => ({ ...prev, page: paginationCfg.current }))
+
+    const params = {
+      page: paginationCfg.current,
+      pageSize: 2
+    }
+    if (sorter.field) {
+      params.sortField = sorter.field
+      params.sortOrder = sorter.order
+    }
+    getData(params)
   }
 
+  function handleCheck(e) {
+    getData({
+      collect: e.target.checked
+    })
+  }
   const router = useRouter()
 
   return (
     <div className="page-application">
       <div className="header-container">
+        <Checkbox onChange={handleCheck}>我的收藏</Checkbox>
         <Button type="primary" onClick={() => setDrawerVisible(true)}>
           创建应用
         </Button>
@@ -84,10 +118,13 @@ export default function Application(props) {
         columns={columns}
         rowKey={record => record._id}
         dataSource={data}
-        pagination={pagination}
-        // loading={this.state.loading}
+        pagination={{
+          ...pagination,
+          showSizeChanger: true,
+          showQuickJumper: true
+        }}
         onChange={handleTableChange}
-        onRow={row => {
+        onRow={_ => {
           return {
             onClick: event => {
               event.persist()
@@ -155,8 +192,15 @@ export default function Application(props) {
   )
 }
 Application.getInitialProps = async () => {
-  const res = await get('api/get-applications')
+  const { list = [], ...pagination } =
+    (await get('api/get-applications', {
+      params: {
+        pageSize: 2,
+        page: 1
+      }
+    })) || {}
   return {
-    data: res || {}
+    data: list,
+    pagination
   }
 }
