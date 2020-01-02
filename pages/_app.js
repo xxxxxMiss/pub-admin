@@ -1,11 +1,20 @@
-import React from 'react'
-import App from 'next/app'
-import { Menu, Icon, Layout, Slider, Button } from 'antd'
-import { post } from '@js/request'
 import './_app.less'
 
-const { Header, Content, Sider } = Layout
+import { Breadcrumb, Layout, Menu } from 'antd'
+import {
+  LaptopOutlined,
+  NotificationOutlined,
+  UserOutlined
+} from '@ant-design/icons'
+
+import App from 'next/app'
+import React from 'react'
+import { post } from '@js/request'
+
 const { SubMenu } = Menu
+const { Header, Content, Sider } = Layout
+
+// //at.alicdn.com/t/font_602462_70iys4kliwg.js
 
 class MyApp extends App {
   // Only uncomment this method if you have blocking data requirements for
@@ -36,56 +45,90 @@ class MyApp extends App {
     const { collapsed } = this.state
     return (
       <Layout>
-        <Sider trigger={null} collapsible collapsed={collapsed}>
-          <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-            <Menu.Item key="1">
-              <Icon type="user" />
-              <span>nav 1</span>
-            </Menu.Item>
-            <Menu.Item key="2">
-              <Icon type="video-camera" />
-              <span>nav 2</span>
-            </Menu.Item>
-            <Menu.Item key="3">
-              <Icon type="upload" />
-              <span>nav 3</span>
-            </Menu.Item>
-          </Menu>
-        </Sider>
-        <Layout>
-          <Header style={{ background: '#fff', padding: '0 24px' }}>
-            <Icon
-              className="trigger"
-              type={collapsed ? 'menu-unfold' : 'menu-fold'}
-              onClick={() =>
-                this.setState({
-                  collapsed: !collapsed
-                })
-              }
-            />
-            <Button onClick={this.logout}>退出</Button>
-          </Header>
-          <Content
-            style={{
-              margin: '24px 16px',
-              padding: 24,
-              background: '#fff',
-              minHeight: 280
-            }}
+        <Header className="header">
+          {/* <div className="logo" />
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            defaultSelectedKeys={['2']}
+            style={{ lineHeight: '64px' }}
           >
-            <Component {...pageProps} />
-          </Content>
+            <Menu.Item key="1">nav 1</Menu.Item>
+            <Menu.Item key="2">nav 2</Menu.Item>
+            <Menu.Item key="3">nav 3</Menu.Item>
+          </Menu> */}
+        </Header>
+        {/* TODO: remove this style */}
+        <Layout style={{ flexDirection: 'row' }}>
+          <Sider width={200} className="site-layout-background">
+            <Menu
+              mode="inline"
+              defaultSelectedKeys={['1']}
+              defaultOpenKeys={['sub1']}
+              style={{ height: '100%', borderRight: 0 }}
+            >
+              <SubMenu
+                key="sub1"
+                title={
+                  <span>
+                    <UserOutlined />
+                    subnav 1
+                  </span>
+                }
+              >
+                <Menu.Item key="1">option1</Menu.Item>
+                <Menu.Item key="2">option2</Menu.Item>
+                <Menu.Item key="3">option3</Menu.Item>
+                <Menu.Item key="4">option4</Menu.Item>
+              </SubMenu>
+              <SubMenu
+                key="sub2"
+                title={
+                  <span>
+                    <LaptopOutlined />
+                    subnav 2
+                  </span>
+                }
+              >
+                <Menu.Item key="5">option5</Menu.Item>
+                <Menu.Item key="6">option6</Menu.Item>
+                <Menu.Item key="7">option7</Menu.Item>
+                <Menu.Item key="8">option8</Menu.Item>
+              </SubMenu>
+              <SubMenu
+                key="sub3"
+                title={
+                  <span>
+                    <NotificationOutlined />
+                    subnav 3
+                  </span>
+                }
+              >
+                <Menu.Item key="9">option9</Menu.Item>
+                <Menu.Item key="10">option10</Menu.Item>
+                <Menu.Item key="11">option11</Menu.Item>
+                <Menu.Item key="12">option12</Menu.Item>
+              </SubMenu>
+            </Menu>
+          </Sider>
+          <Layout style={{ padding: '0 24px 24px' }}>
+            <Breadcrumb style={{ margin: '16px 0' }}>
+              <Breadcrumb.Item>Home</Breadcrumb.Item>
+              <Breadcrumb.Item>List</Breadcrumb.Item>
+              <Breadcrumb.Item>App</Breadcrumb.Item>
+            </Breadcrumb>
+            <Content
+              className="site-layout-background"
+              style={{
+                padding: 24,
+                margin: 0,
+                minHeight: 280
+              }}
+            >
+              <Component {...pageProps} />
+            </Content>
+          </Layout>
         </Layout>
-        <style jsx global>{`
-          .anticon-menu-unfold.trigger,
-          .anticon-menu-fold.trigger {
-            font-size: 20px;
-          }
-          .test {
-            height: 50px;
-            background: #999;
-          }
-        `}</style>
       </Layout>
     )
   }

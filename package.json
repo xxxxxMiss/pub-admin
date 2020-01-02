@@ -12,6 +12,7 @@
   "author": "xxxxxMiss <xxxxxmiss@gmail.com> (https://github.com/xxxxxMiss)",
   "license": "ISC",
   "dependencies": {
+    "@ant-design/icons": "^4.0.0-alpha.18",
     "@zeit/next-css": "^1.0.1",
     "@zeit/next-less": "^1.0.1",
     "antd": "^4.0.0-beta.0",

@@ -1,16 +1,18 @@
-import { useState, useEffect } from 'react'
 import {
   Button,
+  Checkbox,
+  Col,
   Drawer,
   Form,
-  Col,
-  Row,
   Input,
-  message,
+  Row,
   Table,
-  Checkbox
+  message
 } from 'antd'
+import { CopyOutlined } from '@ant-design/icons'
 import { get, post } from '@js/request'
+import { useEffect, useState } from 'react'
+import { IconFont } from '@components'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { useRouter } from 'next/router'
 
@@ -30,7 +32,10 @@ const columns = [
     render: (text, record) => {
       return (
         <>
-          <Button onClick={() => handleCollecton(record._id)}>收藏</Button>
+          <IconFont
+            type="iconcollect_outlined"
+            onClick={() => handleCollecton(record._id)}
+          />
           <span>{text}</span>
         </>
       )
@@ -45,7 +50,7 @@ const columns = [
         <CopyToClipboard onCopy={() => message.success('复制成功')} text={text}>
           <span>
             {text}
-            <Button>复制</Button>
+            <CopyOutlined />
           </span>
         </CopyToClipboard>
       )
@@ -121,7 +126,8 @@ export default function Application(props) {
         pagination={{
           ...pagination,
           showSizeChanger: true,
-          showQuickJumper: true
+          showQuickJumper: true,
+          hideOnSinglePage: true
         }}
         onChange={handleTableChange}
         onRow={_ => {
