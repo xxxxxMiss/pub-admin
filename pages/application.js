@@ -10,7 +10,7 @@ import {
   message
 } from 'antd'
 import { CopyOutlined } from '@ant-design/icons'
-import { get, post } from '@js/request'
+import request, { get, post } from '@js/request'
 import { useEffect, useState } from 'react'
 import { IconFont } from '@components'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
@@ -197,9 +197,9 @@ export default function Application(props) {
     </div>
   )
 }
-Application.getInitialProps = async () => {
+Application.getInitialProps = async ctx => {
   const { list = [], ...pagination } =
-    (await get('api/get-applications', {
+    (await request(ctx).get('/api/get-applications', {
       params: {
         pageSize: 2,
         page: 1

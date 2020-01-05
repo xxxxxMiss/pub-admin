@@ -4,11 +4,13 @@ import { Breadcrumb, Layout, Menu } from 'antd'
 import {
   LaptopOutlined,
   NotificationOutlined,
-  UserOutlined
+  UserOutlined,
+  LogoutOutlined
 } from '@ant-design/icons'
 
 import App from 'next/app'
 import React from 'react'
+import Router from 'next/router'
 import { post } from '@js/request'
 
 const { SubMenu } = Menu
@@ -22,12 +24,12 @@ class MyApp extends App {
   // perform automatic static optimization, causing every page in your app to
   // be server-side rendered.
   //
-  // static async getInitialProps(appContext) {
-  //   // calls page's `getInitialProps` and fills `appProps.pageProps`
-  //   const appProps = await App.getInitialProps(appContext);
-  //
-  //   return { ...appProps }
-  // }
+  static async getInitialProps(appContext) {
+    // calls page's `getInitialProps` and fills `appProps.pageProps`
+    const appProps = await App.getInitialProps(appContext)
+
+    return { ...appProps }
+  }
 
   state = {
     collapsed: false
@@ -36,7 +38,7 @@ class MyApp extends App {
   logout = async () => {
     const res = await post('/api/logout')
     if (res) {
-      // router navigation
+      Router.replace('/user/login')
     }
   }
 
@@ -45,7 +47,7 @@ class MyApp extends App {
     const { collapsed } = this.state
     return (
       <Layout>
-        <Header className="header">
+        <Header className="app-header">
           {/* <div className="logo" />
           <Menu
             theme="dark"
@@ -57,6 +59,10 @@ class MyApp extends App {
             <Menu.Item key="2">nav 2</Menu.Item>
             <Menu.Item key="3">nav 3</Menu.Item>
           </Menu> */}
+          <span className="logout" onClick={this.logout}>
+            <LogoutOutlined />
+            退出
+          </span>
         </Header>
         {/* TODO: remove this style */}
         <Layout style={{ flexDirection: 'row' }}>
@@ -129,6 +135,17 @@ class MyApp extends App {
             </Content>
           </Layout>
         </Layout>
+        <style jsx global>{`
+          .app-header {
+            color: #fff;
+          }
+          .app-header .logout {
+            cursor: pointer;
+          }
+          .logout .anticon-logout {
+            padding-right: 5px;
+          }
+        `}</style>
       </Layout>
     )
   }
