@@ -10,7 +10,7 @@ exports.createApplication = async ctx => {
 
 exports.getList = async ctx => {
   const params = ctx.query
-  const data = await getList(params)
+  const data = await getList(ctx, params)
   ctx.body = {
     code: 0,
     data: { ...data }

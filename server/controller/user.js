@@ -1,4 +1,5 @@
-const { createUser, getUserByName } = require('../service/user')
+const { createUser, getUserByName, getUserById } = require('../service/user')
+const { getApplicationById } = require('../service/application')
 const shajs = require('sha.js')
 
 exports.login = async ctx => {
@@ -63,24 +64,59 @@ exports.register = async ctx => {
 
 exports.collectApplication = async ctx => {
   const user = ctx.session.user
-  const userDoc = await getUserByName(user.name)
+  let userDoc = await getUserByName(user.name)
 
-  const collections = userDoc.collectAppications
+  let collections = userDoc.collectAppications
+  const appid = ctx.request.body.appid
+
+  // mongoose `_id` is a instance of mongodb.ObjectID
   for (let i = 0; i < collections.length; i++) {
-    if (collections[i] === ctx.request.body.appid) {
+    const aid = collections[i]
+    if (aid.toString() === appid) {
       collections.splice(i, 1)
-      userDoc.save()
+      await userDoc.save()
+      const app = await getApplicationById(aid)
+      if (app) {
+        const userids = app.collectedByUsers
+        for (let j = 0; j < userids.length; ++j) {
+          if (userids[j].toString() === user._id.toString()) {
+            userids.splice(j, 1)
+            await app.save()
+            break
+          }
+        }
+      }
       ctx.body = {
         code: 0,
+        data: {
+          isCollected: false
+        },
         message: '取消收藏'
       }
       return
     }
   }
-  collections.push(ctx.request.body.appid)
-  userDoc.save()
+  collections.push(appid)
+  await userDoc.save()
+  const app = await getApplicationById(appid)
+  if (app) {
+    app.collectedByUsers.push(user._id)
+    await app.save()
+  }
   ctx.body = {
     code: 0,
+    data: {
+      isCollected: true
+    },
     message: '收藏成功'
+  }
+}
+
+exports.getUserInfo = async ctx => {
+  // const userinfo = await getUserById(ctx.session.user._id)
+  // TODO: filter filed
+  ctx.body = {
+    code: 0,
+    data: ctx.session.user
   }
 }

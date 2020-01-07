@@ -15,55 +15,11 @@ import { useEffect, useState } from 'react'
 import { IconFont } from '@components'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { useRouter } from 'next/router'
-
-async function handleCollecton(appid) {
-  const res = await post('/api/collect-application', { appid })
-  if (res) {
-    message.success('收藏成功')
-  }
-}
-
-const columns = [
-  {
-    title: '应用名称',
-    dataIndex: 'appName',
-    sorter: true,
-    width: '20%',
-    render: (text, record) => {
-      return (
-        <>
-          <IconFont
-            type="iconcollect_outlined"
-            onClick={() => handleCollecton(record._id)}
-          />
-          <span>{text}</span>
-        </>
-      )
-    }
-  },
-  {
-    title: 'Git地址',
-    dataIndex: 'appGitAddr',
-    sorter: true,
-    render: text => {
-      return (
-        <CopyToClipboard onCopy={() => message.success('复制成功')} text={text}>
-          <span>
-            {text}
-            <CopyOutlined />
-          </span>
-        </CopyToClipboard>
-      )
-    }
-  },
-  {
-    title: '应用语言',
-    dataIndex: 'appLanguage',
-    width: '20%'
-  }
-]
+import { useGlobal } from './_app'
 
 export default function Application(props) {
+  const user = useGlobal()
+  console.log('----------', user)
   const [drawerVisible, setDrawerVisible] = useState(false)
 
   const onFinish = values => {
@@ -110,6 +66,81 @@ export default function Application(props) {
     })
   }
   const router = useRouter()
+
+  // const [collections, setCollections] = useState({})
+  async function handleCollection(appid) {
+    const res = await post('/api/collect-application', { appid })
+    if (res) {
+      message.success(`${res.isCollected ? '收藏成功' : '取消收藏'} `)
+      // setCollections(prev => {
+      //   prev.appid = res.isCollected
+      //   return prev
+      // })
+      getData(pagination)
+    }
+  }
+  const columns = [
+    {
+      title: '应用名称',
+      dataIndex: 'appName',
+      sorter: true,
+      width: '20%',
+      render: (text, record) => {
+        return (
+          <>
+            {/* <IconFont
+              type={
+                record.isCollected
+                  ? 'iconcollect_fillted'
+                  : 'iconcollect_outlined'
+              }
+              onClick={() => handleCollection(record._id)}
+            /> */}
+            {record.isCollected ? (
+              <IconFont
+                type={'iconcollect_filled'}
+                onClick={() => {
+                  handleCollection(record._id)
+                }}
+              />
+            ) : (
+              <IconFont
+                type={'iconcollect_outlined'}
+                onClick={() => {
+                  handleCollection(record._id)
+                }}
+              />
+            )}
+
+            <span>{text}</span>
+          </>
+        )
+      }
+    },
+    {
+      title: 'Git地址',
+      dataIndex: 'appGitAddr',
+      sorter: true,
+      render: text => {
+        return (
+          <CopyToClipboard
+            onCopy={() => message.success('复制成功')}
+            text={text}
+          >
+            <span>
+              {text}
+              <CopyOutlined />
+            </span>
+          </CopyToClipboard>
+        )
+      }
+    },
+    {
+      title: '应用语言',
+      dataIndex: 'appLanguage',
+      width: '20%'
+    }
+  ]
 
   return (
     <div className="page-application">

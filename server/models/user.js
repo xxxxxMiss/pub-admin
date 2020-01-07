@@ -14,7 +14,12 @@ const schema = new Schema({
     default: Date.now()
   },
   phone: String,
-  collectAppications: [Schema.Types.ObjectId]
+  collectAppications: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Application'
+    }
+  ]
 })
 
 module.exports = mongoose.model('User', schema)

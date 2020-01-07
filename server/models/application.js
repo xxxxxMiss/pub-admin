@@ -19,7 +19,13 @@ const schema = new Schema({
   createTime: {
     type: Date,
     default: Date.now()
-  }
+  },
+  collectedByUsers: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ]
 })
 
 module.exports = mongoose.model('Application', schema)

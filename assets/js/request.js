@@ -8,9 +8,9 @@ export default function isomorphicRequest(ctx) {
     baseURL: '',
     headers: {}
   }
-  if (isServer && ctx) {
+  if (isServer && ctx && ctx.req) {
     config.baseURL = 'http://127.0.0.1:8090/'
-    config.headers.Cookie = ctx.req.headers.cookie
+    config.headers.Cookie = ctx.req.headers.cookie ?? ''
   }
   const instance = axios.create(config)
 
@@ -33,7 +33,7 @@ export default function isomorphicRequest(ctx) {
           description: error.message,
           duration: null
         })
-      } else if (error.response.status === 403) {
+      } else if (error?.response?.status === 403) {
         ctx.res.writeHead(302, { Location: '/user/login' })
         ctx.res.end()
       }

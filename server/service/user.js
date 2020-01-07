@@ -7,3 +7,7 @@ exports.createUser = params => {
 exports.getUserByName = name => {
   return User.findOne({ name }).exec()
 }
+
+exports.getUserById = id => {
+  return User.findById(id)
+}
