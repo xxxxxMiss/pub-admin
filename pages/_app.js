@@ -33,9 +33,9 @@ class MyApp extends App {
   static async getInitialProps(appContext) {
     // calls page's `getInitialProps` and fills `appProps.pageProps`
     const appProps = await App.getInitialProps(appContext)
-    const userinfo = await request(appContext.ctx).get('/api/get-userinfo')
-    console.log('--userinfo---', userinfo)
-    return { ...appProps, globalContext: { userinfo } }
+    // const userinfo = await request(appContext.ctx).get('/api/get-userinfo')
+    // console.log('--userinfo---', userinfo)
+    return { ...appProps, globalContext: {} }
   }
 
   state = {

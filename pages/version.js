@@ -1,17 +1,31 @@
 import { Button, Drawer, Form, Input, Select } from 'antd'
-
 import { useState } from 'react'
+import { useRouter } from 'next/router'
+import request, { get } from '@js/request'
 
-export default function Version() {
+export default function Version(props) {
+  const router = useRouter()
   const [visible, setVisible] = useState(false)
-  function addNewVersion() {
+  const [buildInfo, setBuildInfo] = useState([])
+
+  async function addNewVersion() {
+    setVisible(true)
+    const info = await get('/api/get-create-build-info', {
+      params: {
+        appId: router.query.appId
+      }
+    })
+    setBuildInfo(info)
+  }
+
+  function confirm() {
     setVisible(false)
   }
 
   return (
     <div className="page-version">
       <div className="header-container">
-        <Button type="primary" onClick={() => setVisible(true)}>
+        <Button type="primary" onClick={addNewVersion}>
           新增版本
         </Button>
       </div>
@@ -41,8 +55,11 @@ export default function Version() {
           </Form.Item>
           <Form.Item label="Commit">
             <Select placeholder="请选择要发布的分支">
-              <Select.Option value="xx"></Select.Option>
-              <Select.Option value="xx"></Select.Option>
+              {buildInfo.map(item => (
+                <Select.Option key={item.name} value={item.name}>
+                  {item.name}
+                </Select.Option>
+              ))}
             </Select>
             <Select placeholder="请选择要发布的commit"></Select>
           </Form.Item>
@@ -51,7 +68,7 @@ export default function Version() {
           </Form.Item>
           <div className="btn-group">
             <Button onClick={() => setVisible(false)}>取消</Button>
-            <Button onClick={addNewVersion}>确定</Button>
+            <Button onClick={confirm}>确定</Button>
           </div>
         </Form>
       </Drawer>
@@ -66,3 +83,11 @@ export default function Version() {
   )
 }
 //
+Version.getInitialProps = async ctx => {
+  // const data = await request(ctx).get('/api/get-create-build-info', {
+  //   params: {
+  //     appId: ctx.query.appId
+  //   }
+  // })
+  return {}
+}

@@ -40,3 +40,6 @@ mail_opts:
     secure: true
     user: 794465731@qq.com
     pass: zmuxzvvhdotvbcch
+
+gitlab:
+  accessToken: T_of3zf2Jon4mxMwxcRa

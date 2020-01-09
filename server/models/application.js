@@ -16,6 +16,11 @@ const schema = new Schema({
   appLanguage: {
     type: String
   },
+  appId: {
+    // gitlab为每个仓库分配的id
+    type: Number,
+    unique: true
+  },
   createTime: {
     type: Date,
     default: Date.now()

@@ -3,19 +3,24 @@ import { message, notification } from 'antd'
 
 const isServer = typeof window === 'undefined'
 
-export default function isomorphicRequest(ctx) {
+// TODO: use commonjs style for universal
+export default function isomorphicRequest(ctx, options = {}) {
   const config = {
     baseURL: '',
     headers: {}
   }
   if (isServer && ctx && ctx.req) {
-    config.baseURL = 'http://127.0.0.1:8090/'
+    config.baseURL = options.baseURL || 'http://127.0.0.1:8090/'
     config.headers.Cookie = ctx.req.headers.cookie ?? ''
   }
   const instance = axios.create(config)
 
   instance.interceptors.response.use(
     res => {
+      // the third api: eg. gitlab
+      if (options.baseURL) {
+        return res.data
+      }
       const { code, data = {}, message: msg } = res.data
       if (code == 0) {
         return data

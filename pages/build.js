@@ -1,5 +1,6 @@
-import { Drawer, Form, Select, Table } from 'antd'
+import { Drawer, Form, Select, Table, Button, Input } from 'antd'
 import { useEffect, useState } from 'react'
+import request from '@js/request'
 
 const columns = [
   {
@@ -31,10 +32,32 @@ export default function Build() {
     //     onChange={handleTableChange}
     //   />
     <div className="page-build">
-      <div>this is build page</div>
-      <Drawer visible={visible}>
+      <div>
+        <Button type="primary" onClick={() => setVisible(true)}>
+          新增版本
+        </Button>
+      </div>
+      <Drawer
+        visible={visible}
+        width={420}
+        title="新增版本"
+        onClose={() => setVisible(false)}
+      >
         <Form>
-          <Form.Item></Form.Item>
+          <Form.Item label="版本号" name="version">
+            <Input disabled value={Date.now()} />
+          </Form.Item>
+          <Form.Item label="版本名称" name="name">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Node版本" name="nodeVersion">
+            <Select defaultValue="9.0">
+              <Select.Option value="9.0">9.0</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item label="备注" name="remark">
+            <Input />
+          </Form.Item>
         </Form>
       </Drawer>
       <style jsx>{`

@@ -81,21 +81,13 @@ export default function Application(props) {
   }
   const columns = [
     {
-      title: '应用名称',
-      dataIndex: 'appName',
+      title: '应用ID',
+      dataIndex: 'appId',
       sorter: true,
       width: '20%',
       render: (text, record) => {
         return (
           <>
-            {/* <IconFont
-              type={
-                record.isCollected
-                  ? 'iconcollect_fillted'
-                  : 'iconcollect_outlined'
-              }
-              onClick={() => handleCollection(record._id)}
-            /> */}
             {record.isCollected ? (
               <IconFont
                 type={'iconcollect_filled'}
@@ -111,9 +103,35 @@ export default function Application(props) {
                 }}
               />
             )}
-
-            <span>{text}</span>
+            <CopyToClipboard
+              onCopy={() => message.success('复制成功')}
+              text={text}
+            >
+              <span>
+                {text}
+                <CopyOutlined />
+              </span>
+            </CopyToClipboard>
           </>
+        )
+      }
+    },
+    {
+      title: '应用名称',
+      dataIndex: 'appName',
+      sorter: true,
+      width: '20%',
+      render: text => {
+        return (
+          <CopyToClipboard
+            onCopy={() => message.success('复制成功')}
+            text={text}
+          >
+            <span>
+              {text}
+              <CopyOutlined />
+            </span>
+          </CopyToClipboard>
         )
       }
     },
@@ -161,12 +179,12 @@ export default function Application(props) {
           hideOnSinglePage: true
         }}
         onChange={handleTableChange}
-        onRow={_ => {
+        onRow={record => {
           return {
             onClick: event => {
               event.persist()
               if (event.target.tagName === 'TD') {
-                router.push('/build')
+                router.push('/version?appId=' + record.appId)
               }
             }
           }
@@ -187,7 +205,7 @@ export default function Application(props) {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="应用说明" name="appDesc">
+              <Form.Item label="应用ID" name="appId" required>
                 <Input />
               </Form.Item>
             </Col>
@@ -200,6 +218,13 @@ export default function Application(props) {
             </Col>
             <Col span={12}>
               <Form.Item label="使用语言" name="appLanguage" required>
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="应用说明" name="appDesc">
                 <Input />
               </Form.Item>
             </Col>

@@ -5,6 +5,10 @@ const bodyParser = require('koa-bodyparser')
 const session = require('koa-session')
 const MongooseStore = require('koa-session-mongoose')
 
+const log4js = require('log4js')
+const logger = log4js.getLogger()
+logger.level = 'info'
+
 const port = process.env.PORT || 8090
 const dev = process.env.NODE_ENV != 'production'
 const app = next({ dev })
@@ -35,6 +39,7 @@ app.prepare().then(() => {
   })
 
   server.use(async (ctx, next) => {
+    logger.info(`${ctx.method} ${ctx.url}`)
     ctx.res.statusCode = 200
     await next()
   })
@@ -42,7 +47,7 @@ app.prepare().then(() => {
   server.use(router.routes())
 
   server.listen(port, () => {
-    console.log('> Ready on http://localhost:' + port)
+    logger.info('> Ready on http://localhost:' + port)
   })
   connectMongo()
 })
