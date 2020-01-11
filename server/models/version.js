@@ -7,6 +7,10 @@ const versionSchema = new Schema({
     type: Date,
     default: Date.now()
   },
+  version: {
+    type: String,
+    unique: true
+  },
   name: String,
   remark: String,
   nodeVersion: String,

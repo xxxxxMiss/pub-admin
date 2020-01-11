@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { message, notification } from 'antd'
+import Router from 'next/router'
 
 const isServer = typeof window === 'undefined'
 
@@ -33,11 +34,15 @@ export default function isomorphicRequest(ctx, options = {}) {
     error => {
       console.error(error)
       if (!isServer) {
-        notification.error({
-          message: 'Request Error',
-          description: error.message,
-          duration: null
-        })
+        if (error.response.status === 403) {
+          Router.push('/user/login')
+        } else {
+          notification.error({
+            message: 'Request Error',
+            description: error.message,
+            duration: 5000
+          })
+        }
       } else if (error?.response?.status === 403) {
         ctx.res.writeHead(302, { Location: '/user/login' })
         ctx.res.end()

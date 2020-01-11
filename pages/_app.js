@@ -1,4 +1,5 @@
 import './_app.less'
+import '../assets/nprogress.css'
 
 import { Breadcrumb, Layout, Menu } from 'antd'
 import {
@@ -12,6 +13,7 @@ import App from 'next/app'
 import React, { useContext } from 'react'
 import Router from 'next/router'
 import request, { post } from '@js/request'
+import NProgress from 'nprogress'
 
 const { SubMenu } = Menu
 const { Header, Content, Sider } = Layout
@@ -20,6 +22,13 @@ const { Header, Content, Sider } = Layout
 const GlobalContext = React.createContext({})
 
 export const useGlobal = () => useContext(GlobalContext)
+
+Router.events.on('routeChangeStart', url => {
+  console.log('Loading...', url)
+  NProgress.start()
+})
+Router.events.on('routeChangeComplete', () => NProgress.done())
+Router.events.on('routeChangeError', () => NProgress.done())
 
 class MyApp extends App {
   // Only uncomment this method if you have blocking data requirements for

@@ -1,4 +1,5 @@
-import { Form, Icon, Input, Button, Checkbox, notification } from 'antd'
+import { Form, Input, Button, Checkbox } from 'antd'
+import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import { get } from '@js/request'
 import { useRouter } from 'next/router'
 
@@ -17,14 +18,11 @@ export default function Login(props) {
     <div className="page-login">
       <Form labelAlign="left" onFinish={onFinish} className="login-form">
         <Form.Item name="name" required>
-          <Input
-            prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-            placeholder="用户名"
-          />
+          <Input prefix={<UserOutlined />} placeholder="用户名" />
         </Form.Item>
         <Form.Item name="password" required>
           <Input.Password
-            prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+            prefix={<LockOutlined />}
             placeholder="密码"
           ></Input.Password>
         </Form.Item>

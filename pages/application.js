@@ -184,7 +184,13 @@ export default function Application(props) {
             onClick: event => {
               event.persist()
               if (event.target.tagName === 'TD') {
-                router.push('/version?appId=' + record.appId)
+                router.push({
+                  pathname: '/version',
+                  query: {
+                    appId: record.appId,
+                    appName: record.appName
+                  }
+                })
               }
             }
           }
@@ -196,6 +202,7 @@ export default function Application(props) {
         title="创建应用"
         visible={drawerVisible}
         onClose={() => setDrawerVisible(false)}
+        maskClosable={false}
       >
         <Form layout="vertical" onFinish={onFinish}>
           <Row gutter={16}>

@@ -20,11 +20,16 @@ app.prepare().then(() => {
   const server = new Koa()
   const router = new Router()
 
+  if (dev) {
+    server.use(require('koa-logger')())
+  }
   server.keys = ['test']
   server.use(
     session(
       {
-        store: new MongooseStore()
+        store: new MongooseStore({
+          expirationTime: 5 * 60
+        })
       },
       server
     )
@@ -39,7 +44,6 @@ app.prepare().then(() => {
   })
 
   server.use(async (ctx, next) => {
-    logger.info(`${ctx.method} ${ctx.url}`)
     ctx.res.statusCode = 200
     await next()
   })
