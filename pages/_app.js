@@ -15,6 +15,8 @@ import Router from 'next/router'
 import request, { post } from '@js/request'
 import NProgress from 'nprogress'
 
+import io from 'socket.io-client'
+
 const { SubMenu } = Menu
 const { Header, Content, Sider } = Layout
 
@@ -48,7 +50,19 @@ class MyApp extends App {
   }
 
   state = {
-    collapsed: false
+    collapsed: false,
+    socket: null
+  }
+
+  componentDidMount() {
+    const socket = io()
+    this.setState({
+      socket
+    })
+  }
+
+  componentWillUnmount() {
+    this.state.socket.close()
   }
 
   logout = async () => {
@@ -148,7 +162,7 @@ class MyApp extends App {
                   minHeight: 280
                 }}
               >
-                <Component {...pageProps} />
+                <Component {...pageProps} socket={this.state.socket} />
               </Content>
             </Layout>
           </Layout>

@@ -42,6 +42,7 @@ module.exports = {
         config.resolve.alias = {
           ...config.resolve.alias,
           '@js': path.join(__dirname, 'assets/js'),
+          '@hooks': path.join(__dirname, 'assets/hooks'),
           '@components': path.join(__dirname, 'components')
         }
         return config
