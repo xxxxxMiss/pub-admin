@@ -9,9 +9,7 @@ const session = require('koa-session')
 const MongooseStore = require('koa-session-mongoose')
 const child_process = require('child_process')
 
-const log4js = require('log4js')
-const logger = log4js.getLogger()
-logger.level = 'info'
+const logger = require('../assets/js/log')()
 
 const port = process.env.PORT || 8090
 const dev = process.env.NODE_ENV != 'production'
@@ -90,6 +88,7 @@ nextApp.prepare().then(() => {
   app.use(router.routes())
 
   server.listen(port, () => {
+    console.log('------------', port)
     logger.info('> Ready on http://localhost:' + port)
   })
   connectMongo()

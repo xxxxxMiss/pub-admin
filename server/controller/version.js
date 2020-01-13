@@ -2,6 +2,7 @@ const { createVersion, getCreateBuildInfo } = require('../service/version')
 const axios = require('axios')
 const config = require('../../config')
 const dayjs = require('dayjs')
+const logger = require('../../assets/js/log')()
 
 exports.createVersion = async ctx => {
   const params = ctx.request.body
@@ -20,14 +21,23 @@ exports.createVersion = async ctx => {
 
 exports.getCreateBuildInfo = async ctx => {
   const projectId = ctx.query.appId
-  const branches = await axios.get(
-    `http://gitlab.dajiba.vip/api/v4/projects/${projectId}/repository/branches`,
-    {
-      headers: {
-        private_token: config.gitlab.accessToken
+  let branches = null
+  try {
+    branches = await axios.get(
+      `http://gitlab.dajiba.vip/api/v4/projects/${projectId}/repository/branches`,
+      {
+        headers: {
+          private_token: config.gitlab.accessToken
+        }
       }
-    }
-  )
+    )
+    logger.info(
+      `/api/v4/projects/${projectId}/repository/branches`,
+      branches && branches.data
+    )
+  } catch (error) {
+    logger.error(error.message)
+  }
   if (branches.status == 200) {
     const result = []
     // const since = dayjs()
@@ -43,8 +53,10 @@ exports.getCreateBuildInfo = async ctx => {
           }
         }
       )
-      console.log('---name--', name)
-      console.log('-----', commits.data)
+      logger.info(
+        `/api/v4/projects/${projectId}/repository/commits`,
+        commits && commits.data
+      )
       // transform data:  for frontend convenient loop
       commits = (commits.data || []).map(item => {
         item.label = item.short_id
