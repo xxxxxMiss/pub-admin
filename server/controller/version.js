@@ -1,8 +1,9 @@
-const { createVersion, getCreateBuildInfo } = require('../service/version')
+const { createVersion, createNewVersion } = require('../service/version')
 const axios = require('axios')
 const config = require('../../config')
 const dayjs = require('dayjs')
 const logger = require('../../assets/js/log')()
+const { getNodeVersions } = require('../../assets/js/utils')
 
 exports.createVersion = async ctx => {
   const params = ctx.request.body
@@ -76,5 +77,27 @@ exports.getCreateBuildInfo = async ctx => {
   } else {
     ctx.status = res.status
     ctx.res.end()
+  }
+}
+
+exports.getNodeVersions = async ctx => {
+  const versions = await getNodeVersions()
+  ctx.body = {
+    code: 0,
+    data: versions
+  }
+}
+
+exports.createNewVersion = async ctx => {
+  logger.info(ctx.request.body)
+
+  const res = await createNewVersion(ctx.request.body)
+
+  // TODO: exec serial build-commands
+  if (res) {
+    ctx.body = {
+      code: 0,
+      data: 'OK'
+    }
   }
 }

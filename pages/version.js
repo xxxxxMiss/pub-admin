@@ -20,6 +20,7 @@ export default function Version(props) {
 
   const [visible, setVisible] = useState(false)
   const [buildInfo, setBuildInfo] = useState([])
+  const [nodeVersions, setNodeVersions] = useState([])
 
   async function addNewVersion() {
     setVisible(true)
@@ -28,7 +29,9 @@ export default function Version(props) {
         appId: router.query.appId
       }
     })
+    const nodeVersion = await get('/api/get-node-versions')
     setBuildInfo(info || [])
+    setNodeVersions(nodeVersion || [])
   }
 
   function confirm() {
@@ -56,10 +59,9 @@ export default function Version(props) {
     values.commit = commit
     Reflect.deleteProperty(values, 'branch_commit')
     console.log('----values----', values)
-    return
 
     // TODO: wait backend
-    const res = await post('/api/new-version', values)
+    const res = await post('/api/create-new-version', values)
     if (res) {
       message.success('新增版本成功')
     }
@@ -90,7 +92,7 @@ export default function Version(props) {
           form={form}
           initialValues={{
             buildTool: 'npm',
-            version: dayjs().format('YYYYMMDDdddHHmmssa')
+            version: dayjs().format('YYYYMMDDHHmmss')
           }}
           onFinish={onFinish}
           {...formLayout}
@@ -100,13 +102,19 @@ export default function Version(props) {
             <Input disabled />
           </Form.Item>
           <Form.Item label="版本名称" name="name" required>
-            <Input />
+            <Input placeholder="请输入版本名称" />
           </Form.Item>
           <Form.Item label="Node版本" name="nodeVersion" required>
-            <Input />
+            <Select defaultValue={nodeVersions[0]} placeholder="请选择node版本">
+              {nodeVersions.map(val => (
+                <Select.Option key={val} value={val}>
+                  {val}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.Item label="备注" name="remark">
-            <Input />
+            <Input placeholder="对此次构建的简单描述" />
           </Form.Item>
           <Form.Item label="分支/Commit" name="branch_commit">
             <Cascader

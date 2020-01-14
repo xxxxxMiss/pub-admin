@@ -6,7 +6,11 @@ const {
   collectApplication
 } = require('./controller/user')
 const { createApplication, getList } = require('./controller/application')
-const { getCreateBuildInfo } = require('./controller/version')
+const {
+  getCreateBuildInfo,
+  getNodeVersions,
+  createNewVersion
+} = require('./controller/version')
 
 const checkLogin = require('./middlewares/checkLogin')
 
@@ -19,4 +23,6 @@ module.exports = router => {
   router.post('/api/collect-application', checkLogin, collectApplication)
   router.get('/api/get-userinfo', checkLogin, getUserInfo)
   router.get('/api/get-create-build-info', checkLogin, getCreateBuildInfo)
+  router.get('/api/get-node-versions', checkLogin, getNodeVersions)
+  router.get('/api/create-new-version', checkLogin, createNewVersion)
 }
