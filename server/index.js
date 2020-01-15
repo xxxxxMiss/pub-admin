@@ -87,8 +87,12 @@ nextApp.prepare().then(() => {
 
   app.use(router.routes())
 
+  app.on('error', error => {
+    logger.info(error)
+    // TODO: use sentry to collect error info
+  })
+
   server.listen(port, () => {
-    console.log('------------', port)
     logger.info('> Ready on http://localhost:' + port)
   })
   connectMongo()

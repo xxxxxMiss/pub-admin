@@ -24,5 +24,5 @@ module.exports = router => {
   router.get('/api/get-userinfo', checkLogin, getUserInfo)
   router.get('/api/get-create-build-info', checkLogin, getCreateBuildInfo)
   router.get('/api/get-node-versions', checkLogin, getNodeVersions)
-  router.get('/api/create-new-version', checkLogin, createNewVersion)
+  router.post('/api/create-new-version', checkLogin, createNewVersion)
 }

@@ -188,7 +188,8 @@ export default function Application(props) {
                   pathname: '/version',
                   query: {
                     appId: record.appId,
-                    appName: record.appName
+                    appName: record.appName,
+                    gitUrl: record.appGitAddr
                   }
                 })
               }

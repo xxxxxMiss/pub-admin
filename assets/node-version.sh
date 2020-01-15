@@ -1,3 +1,7 @@
 #!/bin/bash
 
-echo $NVM_DIR
+cd /opt/frontend
+
+git checkout $branch_name
+
+git pull

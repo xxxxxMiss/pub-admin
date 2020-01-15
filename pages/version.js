@@ -92,7 +92,8 @@ export default function Version(props) {
           form={form}
           initialValues={{
             buildTool: 'npm',
-            version: dayjs().format('YYYYMMDDHHmmss')
+            version: dayjs().format('YYYYMMDDHHmmss'),
+            gitUrl: router.query.gitUrl
           }}
           onFinish={onFinish}
           {...formLayout}
@@ -115,6 +116,9 @@ export default function Version(props) {
           </Form.Item>
           <Form.Item label="备注" name="remark">
             <Input placeholder="对此次构建的简单描述" />
+          </Form.Item>
+          <Form.Item label="git地址" name="gitUrl">
+            <Input disabled />
           </Form.Item>
           <Form.Item label="分支/Commit" name="branch_commit">
             <Cascader

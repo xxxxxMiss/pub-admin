@@ -4,6 +4,7 @@ const config = require('../../config')
 const dayjs = require('dayjs')
 const logger = require('../../assets/js/log')()
 const { getNodeVersions } = require('../../assets/js/utils')
+const buildPackage = require('../../assets/js/build-command')
 
 exports.createVersion = async ctx => {
   const params = ctx.request.body
@@ -89,9 +90,10 @@ exports.getNodeVersions = async ctx => {
 }
 
 exports.createNewVersion = async ctx => {
-  logger.info(ctx.request.body)
+  const body = ctx.request.body
+  logger.info(body)
 
-  const res = await createNewVersion(ctx.request.body)
+  const res = await createNewVersion(body)
 
   // TODO: exec serial build-commands
   if (res) {
@@ -99,5 +101,6 @@ exports.createNewVersion = async ctx => {
       code: 0,
       data: 'OK'
     }
+    await buildPackage(body)
   }
 }
