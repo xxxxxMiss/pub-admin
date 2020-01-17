@@ -43,3 +43,13 @@ mail_opts:
 
 gitlab:
   accessToken: T_of3zf2Jon4mxMwxcRa
+
+buildPath:
+  development:
+    repo: /Users/qsch/test__xx
+    log: /Users/qsch/test__xx/build_log
+    archiver: /Users/qsch/test__xx/archiver
+  production:
+    repo: '/opt/frontend/$repo_name'
+    log: '/var/logs/$repo_name'
+    archiver: '/opt/frontend/$repo_name/archiver'

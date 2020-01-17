@@ -1,50 +1,97 @@
 const fs = require('fs')
-const child_process = require('child_process')
-const util = require('util')
-const exec = util.promisify(child_process.exec)
-const os = require('os')
+const { exec } = require('child_process')
 const path = require('path')
-
-module.exports = async function build(options) {
-  const { gitUrl, branch, buildTool, nodeVersion } = options
-  const repoDir = gitUrl
-    .substring(gitUrl.lastIndexOf('/') + 1)
-    .replace('.git', '')
-  // const targetPath = '/opt/frontend'
-  const targetPath = path.join(os.homedir(), 'test__xx')
-  const buildLogPath = path.join(targetPath, 'build_log')
-  fs.mkdirSync(buildLogPath)
-  const logPath = path.join(buildLogPath, '1.txt')
-
-  if (!fs.existsSync(repoDir)) {
-    const cloneLog = await exec(`git clone ${gitUrl}`, { cwd: targetPath })
-    fs.appendFileSync(logPath, cloneLog.stdout)
+const config = require('../../config')
+const logger = require('../js/log')()
+const error = error => {
+  if (error) {
+    logger.error(error)
   }
-  const cwd = path.join(targetPath, repoDir)
-  try {
-    const checkoutLog = await exec(`git checkout ${branch}`, {
-      cwd
+}
+const buildEvent = require('./socketio-event')
+
+module.exports = function build(app) {
+  return function(options) {
+    return new Promise((resolve, reject) => {
+      const { gitUrl, branch, buildTool, nodeVersion, name } = options
+      const repoName = gitUrl
+        .substring(gitUrl.lastIndexOf('/') + 1)
+        .replace('.git', '')
+
+      const env = process.env.NODE_ENV || 'development'
+      let cwd = config.buildPath[env].repo.replace('$repo_name', repoName)
+      const buildLogPath = config.buildPath[env].log.replace(
+        '$repo_name',
+        repoName
+      )
+      const logPath = path.join(buildLogPath, `${name}.log`)
+      const archiverPath = config.buildPath[env].archiver.replace(
+        '$repo_name',
+        repoName
+      )
+
+      if (!fs.existsSync(buildLogPath)) {
+        fs.mkdirSync(buildLogPath, { recursive: true })
+      }
+
+      let commands = []
+      if (!fs.existsSync(cwd)) {
+        commands.push(`git clone ${gitUrl} && cd ${repoName}`)
+      } else {
+        cwd = path.join(cwd, repoName)
+      }
+      try {
+        commands.push(`git checkout ${branch}`)
+      } catch (error) {
+        commands.push(`git checkout -b ${branch}`)
+      }
+      commands.push(`git pull`)
+      commands.push(`source $NVM_DIR/nvm.sh && nvm use ${nodeVersion}`)
+      // commands.push(`nrm use taobao`)
+      if (buildTool === 'npm') {
+        commands.push(`npm install`)
+        // TODO: support multi stage command: test uat pro
+        commands.push(`npm run build`)
+      } else if (buildTool === 'yarn') {
+        commands.push(`yarn build`)
+      }
+
+      const subprocess = exec(commands.join(' && '), { cwd })
+      subprocess.stdout.on('data', data => {
+        // socket.io
+        buildEvent.emit('build:info', data)
+        fs.appendFile(logPath, data, error)
+      })
+      subprocess.stderr.on('data', data => {
+        buildEvent.emit('build:info', data)
+        fs.appendFile(logPath, data, error)
+      })
+      subprocess.on('close', (code, signal) => {
+        buildEvent.emit('build:end')
+        resolve(code, signal)
+        // close socket.io
+        if (signal) {
+          fs.appendFile(
+            logPath,
+            `>>>>>>>build end with signal: ${signal}>>>>>>`,
+            error
+          )
+        } else {
+          fs.appendFile(
+            logPath,
+            `>>>>>>>build end with code: ${code}>>>>>>`,
+            error
+          )
+        }
+      })
+      subprocess.on('error', error => {
+        reject(error)
+        fs.appendFile(
+          logPath,
+          `>>>>>>>build error>>>>>>>\r\n${error.toString()}`,
+          error
+        )
+      })
     })
-    fs.appendFileSync(logPath, checkoutLog.stdout)
-  } catch (error) {
-    const checkoutLog = await exec(`git checkout -b ${branch}`, { cwd })
-    fs.appendFileSync(logPath, checkoutLog.stdout)
-  }
-  const pullLog = await exec(`git pull`, { cwd })
-  fs.appendFileSync(logPath, pullLog.stdout)
-  const nvmLog = await exec(
-    `source $NVM_DIR/nvm.sh && nvm use ${nodeVersion}`,
-    { cwd }
-  )
-  fs.appendFileSync(logPath, nvmLog.stdout)
-  await exec(`nrm use taobao`)
-  if (buildTool === 'npm') {
-    const installLog = await exec(`npm install`, { cwd })
-    fs.appendFileSync(logPath, installLog.stdout)
-    const buildLog = await exec(`npm run build`, { cwd })
-    fs.appendFileSync(logPath, buildLog.stdout)
-  } else if (buildTool === 'yarn') {
-    const buildLog = await exec(`yarn build`, { cwd })
-    fs.appendFileSync(logPath, buildLog.stdout)
   }
 }

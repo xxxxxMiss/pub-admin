@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
 import io from 'socket.io-client'
 
-const socket = io()
+const socket = io({
+  reconnectionAttempts: 10
+})
 
 export default function useSocket(eventName, cb) {
   useEffect(() => {

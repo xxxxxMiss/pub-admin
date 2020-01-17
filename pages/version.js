@@ -7,12 +7,16 @@ import {
   Input,
   Select,
   Cascader,
-  message
+  message,
+  Modal
 } from 'antd'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import request, { get, post } from '@js/request'
 import dayjs from 'dayjs'
+import useSocket from '@hooks/useSocket'
+import SyntaxHighlighter from 'react-syntax-highlighter'
+import { darcula } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 
 export default function Version(props) {
   const router = useRouter()
@@ -21,6 +25,12 @@ export default function Version(props) {
   const [visible, setVisible] = useState(false)
   const [buildInfo, setBuildInfo] = useState([])
   const [nodeVersions, setNodeVersions] = useState([])
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalContent, setModalContent] = useState('')
+
+  const socket = useSocket('build:info', buildinfo => {
+    setModalContent(buildinfo)
+  })
 
   async function addNewVersion() {
     setVisible(true)
@@ -32,10 +42,6 @@ export default function Version(props) {
     const nodeVersion = await get('/api/get-node-versions')
     setBuildInfo(info || [])
     setNodeVersions(nodeVersion || [])
-  }
-
-  function confirm() {
-    setVisible(false)
   }
 
   const formLayout = {
@@ -67,6 +73,23 @@ export default function Version(props) {
     }
   }
 
+  let end = false
+  useSocket('build:end', () => {
+    end = true
+    socket.close()
+  })
+  function confirm() {
+    setVisible(false)
+    setModalVisible(true)
+    const interval = setInterval(() => {
+      if (end) {
+        clearInterval(interval)
+      } else {
+        socket.emit('build:info')
+      }
+    }, 2500)
+  }
+
   return (
     <div className="page-version">
       <div className="header-container">
@@ -74,6 +97,17 @@ export default function Version(props) {
           新增版本
         </Button>
       </div>
+      <Modal
+        title="测试标题"
+        visible={modalVisible}
+        footer={null}
+        onCancel={() => setModalVisible(false)}
+        width="70%"
+      >
+        <SyntaxHighlighter language="bash" style={darcula}>
+          {modalContent || '(num) => num + 1'}
+        </SyntaxHighlighter>
+      </Modal>
       <Drawer
         visible={visible}
         closable

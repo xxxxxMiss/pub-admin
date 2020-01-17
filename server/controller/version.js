@@ -1,7 +1,10 @@
-const { createVersion, createNewVersion } = require('../service/version')
+const {
+  createVersion,
+  createNewVersion,
+  removeVersionById
+} = require('../service/version')
 const axios = require('axios')
 const config = require('../../config')
-const dayjs = require('dayjs')
 const logger = require('../../assets/js/log')()
 const { getNodeVersions } = require('../../assets/js/utils')
 const buildPackage = require('../../assets/js/build-command')
@@ -101,6 +104,11 @@ exports.createNewVersion = async ctx => {
       code: 0,
       data: 'OK'
     }
-    await buildPackage(body)
+    try {
+      await buildPackage(ctx.app)(body)
+    } catch (error) {
+      logger.error(error)
+      removeVersionById(res._id)
+    }
   }
 }

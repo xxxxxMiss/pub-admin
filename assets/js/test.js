@@ -1,10 +1,5 @@
-const { exec } = require('child_process')
+const { exec, execFile } = require('child_process')
+const path = require('path')
+const fs = require('fs')
 
-exec(`source $NVM_DIR/nvm.sh && nvm use v10`, (error, stdout, stderr) => {
-  if (error) {
-    console.log(error)
-  } else {
-    console.log(stdout)
-    console.log(stderr)
-  }
-})
+console.log(fs.existsSync(path.join(__dirname, '../hooks')))
