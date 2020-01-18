@@ -1,10 +1,17 @@
 import { Form, Button, Input, message } from 'antd'
 import { post } from '@js/request'
+import { userJoiSchema } from '@js/validation'
 
 export default function Register() {
   async function onFinish(values) {
-    const { name, password } = values
-    const res = await post('/api/register', { name, password })
+    const { error, value } = userJoiSchema.validate(values)
+    if (error) {
+      console.log('-------', value)
+      console.log('----error---', error)
+      return
+    }
+    const { name, password, repeat_password } = values
+    const res = await post('/api/register', { name, password, repeat_password })
     if (res) {
       message.success('注册成功')
     }
@@ -16,10 +23,17 @@ export default function Register() {
           label="用户名"
           name="name"
           rules={[
-            {
-              required: true,
-              message: '用户名不能为空'
-            }
+            // {
+            //   required: true,
+            //   message: '用户名不能为空'
+            // }
+            ({ getFieldValue }) => ({
+              validator(rule, value) {
+                console.log(rule)
+                console.log(value)
+                return Promise.resolve()
+              }
+            })
           ]}
         >
           <Input placeholder="请输入用户名"></Input>
@@ -38,7 +52,7 @@ export default function Register() {
         </Form.Item>
         <Form.Item
           label="确认密码"
-          name="confirm"
+          name="repeat_password"
           dependencies={['password']}
           required
           rules={[

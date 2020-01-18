@@ -9,6 +9,7 @@ const { createApplication, getList } = require('./controller/application')
 const {
   getCreateBuildInfo,
   getNodeVersions,
+  getPkgList,
   createNewVersion
 } = require('./controller/version')
 
@@ -25,4 +26,5 @@ module.exports = router => {
   router.get('/api/get-create-build-info', checkLogin, getCreateBuildInfo)
   router.get('/api/get-node-versions', checkLogin, getNodeVersions)
   router.post('/api/create-new-version', checkLogin, createNewVersion)
+  router.get('/api/get-pkg-list', checkLogin, getPkgList)
 }

@@ -187,7 +187,7 @@ export default function Application(props) {
                 router.push({
                   pathname: '/version',
                   query: {
-                    appId: record.appId,
+                    appid: record.appid,
                     appName: record.appName,
                     gitUrl: record.appGitAddr
                   }

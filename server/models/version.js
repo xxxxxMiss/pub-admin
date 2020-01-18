@@ -20,7 +20,8 @@ const versionSchema = new Schema({
   nodeVersion: String,
   buildTool: String,
   branch: String,
-  commit: String
+  commit: String,
+  appid: Number
 })
 
 module.exports = mongoose.model('Version', versionSchema)

@@ -8,16 +8,65 @@ import {
   Select,
   Cascader,
   message,
-  Modal
+  Modal,
+  Table
 } from 'antd'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import request, { get, post } from '@js/request'
 import dayjs from 'dayjs'
 import useSocket from '@hooks/useSocket'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { darcula } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import dynamic from 'next/dynamic'
 
+import { LoadingOutlined, CheckCircleTwoTone } from '@ant-design/icons'
+
+const HighlightNoSSR = dynamic(() => import('@components/Highlight'), {
+  ssr: false
+})
+
+const columns = [
+  {
+    title: '版本号',
+    dataIndex: 'version',
+    width: '20%'
+  },
+  {
+    title: '版本号',
+    dataIndex: 'version',
+    width: '20%'
+  },
+  {
+    title: '编译状态',
+    dataIndex: 'status',
+    width: '20%',
+    render(text, record) {
+      return (
+        <Row>
+          <Col>
+            <p>FAT</p>
+            <LoadingOutlined />
+          </Col>
+          <Col>
+            <p>UAT</p>
+            <LoadingOutlined />
+          </Col>
+          <Col>
+            <p>PRO</p>
+            <LoadingOutlined />
+          </Col>
+        </Row>
+      )
+    }
+  },
+  {
+    title: 'FAT',
+    dataIndex: 'FAT',
+    width: '20%',
+    render(text, record) {
+      return <CheckCircleTwoTone />
+    }
+  }
+]
 export default function Version(props) {
   const router = useRouter()
   const [form] = Form.useForm()
@@ -36,7 +85,7 @@ export default function Version(props) {
     setVisible(true)
     const info = await get('/api/get-create-build-info', {
       params: {
-        appId: router.query.appId
+        appid: router.query.appid
       }
     })
     const nodeVersion = await get('/api/get-node-versions')
@@ -64,9 +113,7 @@ export default function Version(props) {
     values.branch = branch
     values.commit = commit
     Reflect.deleteProperty(values, 'branch_commit')
-    console.log('----values----', values)
 
-    // TODO: wait backend
     const res = await post('/api/create-new-version', values)
     if (res) {
       message.success('新增版本成功')
@@ -97,17 +144,12 @@ export default function Version(props) {
           新增版本
         </Button>
       </div>
-      <Modal
-        title="测试标题"
-        visible={modalVisible}
-        footer={null}
-        onCancel={() => setModalVisible(false)}
-        width="70%"
-      >
-        <SyntaxHighlighter language="bash" style={darcula}>
-          {modalContent || '(num) => num + 1'}
-        </SyntaxHighlighter>
-      </Modal>
+      <Table columns={columns}></Table>
+      <HighlightNoSSR
+        modalVisible={modalVisible}
+        modalContent={modalContent}
+        setModalVisible={setModalVisible}
+      />
       <Drawer
         visible={visible}
         closable
@@ -120,7 +162,7 @@ export default function Version(props) {
       >
         <div className="drawer-header">
           <span>应用名称：{router.query.appName}</span>
-          <span>应用ID：{router.query.appId}</span>
+          <span>应用ID：{router.query.appid}</span>
         </div>
         <Form
           form={form}
@@ -221,10 +263,10 @@ export default function Version(props) {
 }
 //
 Version.getInitialProps = async ctx => {
-  // const data = await request(ctx).get('/api/get-create-build-info', {
-  //   params: {
-  //     appId: ctx.query.appId
-  //   }
-  // })
-  return {}
+  const data = await request(ctx).get('/api/get-pkg-list', {
+    params: {
+      appid: ctx.query.appid
+    }
+  })
+  return { list: data || [] }
 }

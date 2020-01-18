@@ -1,7 +1,8 @@
 const {
   createVersion,
   createNewVersion,
-  removeVersionById
+  removeVersionById,
+  getPkgList
 } = require('../service/version')
 const axios = require('axios')
 const config = require('../../config')
@@ -109,6 +110,17 @@ exports.createNewVersion = async ctx => {
     } catch (error) {
       logger.error(error)
       removeVersionById(res._id)
+    }
+  }
+}
+
+exports.getPkgList = async ctx => {
+  const query = ctx.query
+  const list = getPkgList(query)
+  if (list) {
+    ctx.body = {
+      code: 0,
+      data: list
     }
   }
 }

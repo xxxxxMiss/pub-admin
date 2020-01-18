@@ -1,6 +1,7 @@
 const { createUser, getUserByName, getUserById } = require('../service/user')
 const { getApplicationById } = require('../service/application')
 const shajs = require('sha.js')
+const { userJoiSchema } = require('../../assets/js/validation')
 
 exports.login = async ctx => {
   const { name, password } = ctx.query
@@ -41,6 +42,8 @@ exports.logout = async ctx => {
 
 exports.register = async ctx => {
   const params = ctx.request.body
+  const value = userJoiSchema.validate(params)
+  console.log('---value---', value)
   params.password = shajs('sha256')
     .update(params.password)
     .digest('hex')

@@ -16,7 +16,7 @@ const schema = new Schema({
   appLanguage: {
     type: String
   },
-  appId: {
+  appid: {
     // gitlab为每个仓库分配的id
     type: Number,
     unique: true
