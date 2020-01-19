@@ -82,7 +82,7 @@ export default function Application(props) {
   const columns = [
     {
       title: '应用ID',
-      dataIndex: 'appId',
+      dataIndex: 'appid',
       sorter: true,
       width: '20%',
       render: (text, record) => {
@@ -213,7 +213,7 @@ export default function Application(props) {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="应用ID" name="appId" required>
+              <Form.Item label="应用ID" name="appid" required>
                 <Input />
               </Form.Item>
             </Col>

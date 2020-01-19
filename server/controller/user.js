@@ -42,8 +42,13 @@ exports.logout = async ctx => {
 
 exports.register = async ctx => {
   const params = ctx.request.body
-  const value = userJoiSchema.validate(params)
-  console.log('---value---', value)
+  Reflect.deleteProperty(params, 'repeat_password')
+  const { error } = userJoiSchema.validate(params)
+  if (error) {
+    ctx.status = 400
+    ctx.message = error.message
+    return
+  }
   params.password = shajs('sha256')
     .update(params.password)
     .digest('hex')
