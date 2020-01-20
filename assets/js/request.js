@@ -5,6 +5,7 @@ const { message } = require('antd')
 const isServer = typeof window === 'undefined'
 
 function isomorphicRequest(ctx, options = {}) {
+  const logger = isServer ? ctx.logger : console
   const config = {
     baseURL: '',
     headers: {},
@@ -32,7 +33,6 @@ function isomorphicRequest(ctx, options = {}) {
       return null
     },
     error => {
-      console.error(error)
       if (error.response) {
         if (!isServer) {
           if (error.response.status === 403) {
@@ -48,10 +48,10 @@ function isomorphicRequest(ctx, options = {}) {
         if (!isServer) {
           message.error(error.request)
         } else {
-          console.error(error.request)
+          logger.error(error.request)
         }
       } else {
-        console.error(error)
+        logger.error(error)
       }
     }
   )

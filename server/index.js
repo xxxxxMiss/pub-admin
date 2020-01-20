@@ -7,7 +7,7 @@ const bodyParser = require('koa-bodyparser')
 const session = require('koa-session')
 const MongooseStore = require('koa-session-mongoose')
 
-const logger = require('../assets/js/log')()
+const logger = require('./middlewares/logger')
 
 const port = process.env.PORT || 8090
 const dev = process.env.NODE_ENV != 'production'
@@ -20,9 +20,7 @@ require('../assets/js/create-socket-server')(server)
 
 nextApp.prepare().then(() => {
   const router = new Router()
-  if (dev) {
-    app.use(require('koa-logger')())
-  }
+  app.use(logger())
   app.keys = ['test']
   app.use(
     session(
@@ -50,8 +48,8 @@ nextApp.prepare().then(() => {
 
   app.use(router.routes())
 
-  app.on('error', error => {
-    logger.info(error)
+  app.on('error', (error, ctx) => {
+    ctx.logger.info(error)
     // TODO: use sentry to collect error info
   })
 
