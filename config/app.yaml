@@ -51,5 +51,5 @@ buildPath:
     archiver: /Users/qsch/test__xx/archiver
   production:
     repo: '/opt/frontend/$repo_name'
-    log: '/var/logs/$repo_name'
+    log: '/var/log/$repo_name'
     archiver: '/opt/frontend/$repo_name/archiver'

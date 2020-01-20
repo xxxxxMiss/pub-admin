@@ -20,7 +20,7 @@ function isomorphicRequest(ctx, options = {}) {
   instance.interceptors.response.use(
     res => {
       // the third api: eg. gitlab
-      if (options.baseURL) {
+      if (options.baseURL || /text\/plain/.test(res.headers['content-type'])) {
         return res.data
       }
       const { code, data = {}, message: msg } = res.data

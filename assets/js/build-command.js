@@ -1,5 +1,5 @@
 const fs = require('fs')
-const { exec } = require('child_process')
+const { spawn } = require('child_process')
 const path = require('path')
 const config = require('../../config')
 const logger = require('../js/log')()
@@ -10,10 +10,10 @@ const error = error => {
 }
 const buildEvent = require('./socketio-event')
 
-module.exports = function build(app) {
+module.exports = function build() {
   return function(options) {
     return new Promise((resolve, reject) => {
-      const { gitUrl, branch, buildTool, nodeVersion, name } = options
+      const { gitUrl, branch, buildTool, nodeVersion, name, stage } = options
       const repoName = gitUrl
         .substring(gitUrl.lastIndexOf('/') + 1)
         .replace('.git', '')
@@ -51,12 +51,12 @@ module.exports = function build(app) {
       if (buildTool === 'npm') {
         commands.push(`npm install`)
         // TODO: support multi stage command: test uat pro
-        commands.push(`npm run build`)
+        commands.push(`npm run ${stage}`)
       } else if (buildTool === 'yarn') {
         commands.push(`yarn build`)
       }
 
-      const subprocess = exec(commands.join(' && '), { cwd })
+      const subprocess = spawn(commands.join(' && '), { cwd, shell: true })
       subprocess.stdout.on('data', data => {
         // socket.io
         buildEvent.emit('build:info', data)
@@ -85,6 +85,7 @@ module.exports = function build(app) {
         }
       })
       subprocess.on('error', error => {
+        buildEvent.emit('build:error')
         reject(error)
         fs.appendFile(
           logPath,

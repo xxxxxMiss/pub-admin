@@ -12,6 +12,17 @@ exports.removeVersionById = id => {
   return Version.findByIdAndRemove(id).exec()
 }
 
+exports.updateBuildStatus = (id, status) => {
+  // Promise<{n, nModified}>
+  return Version.update(
+    {
+      _id: id,
+      status
+    },
+    { $set: { 'status.$': status } }
+  ).exec()
+}
+
 exports.getPkgList = params => {
   const { page, pageSize, appid } = params
   const options = {

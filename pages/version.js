@@ -24,50 +24,61 @@ const HighlightNoSSR = dynamic(() => import('@components/Highlight'), {
   ssr: false
 })
 
-const columns = [
-  {
-    title: '版本号',
-    dataIndex: 'version',
-    width: '20%'
-  },
-  {
-    title: '版本号',
-    dataIndex: 'version',
-    width: '20%'
-  },
-  {
-    title: '编译状态',
-    dataIndex: 'status',
-    width: '20%',
-    render(text, record) {
-      return (
-        <Row>
-          <Col>
-            <p>FAT</p>
-            <LoadingOutlined />
-          </Col>
-          <Col>
-            <p>UAT</p>
-            <LoadingOutlined />
-          </Col>
-          <Col>
-            <p>PRO</p>
-            <LoadingOutlined />
-          </Col>
-        </Row>
-      )
-    }
-  },
-  {
-    title: 'FAT',
-    dataIndex: 'FAT',
-    width: '20%',
-    render(text, record) {
-      return <CheckCircleTwoTone />
-    }
-  }
-]
 export default function Version(props) {
+  const columns = [
+    {
+      title: '版本号',
+      dataIndex: 'version',
+      width: '20%'
+    },
+    {
+      title: '版本号',
+      dataIndex: 'version',
+      width: '20%'
+    },
+    {
+      title: '编译状态',
+      dataIndex: 'status',
+      width: '20%',
+      render(text, record) {
+        return (
+          <Row gutter={15}>
+            <Col>
+              <p>FAT</p>
+              <LoadingOutlined />
+            </Col>
+            <Col>
+              <p>UAT</p>
+              <LoadingOutlined />
+            </Col>
+            <Col>
+              <p>PRO</p>
+              <LoadingOutlined />
+            </Col>
+          </Row>
+        )
+      }
+    },
+    {
+      title: 'FAT',
+      dataIndex: 'FAT',
+      width: '20%',
+      render(text, record) {
+        return <CheckCircleTwoTone />
+      }
+    },
+    {
+      title: '操作',
+      dataIndex: 'action',
+      render(text, record) {
+        return (
+          <Button type="ghost" onClick={() => viewLog(record.version)}>
+            查看日志
+          </Button>
+        )
+      }
+    }
+  ]
   const router = useRouter()
   const [form] = Form.useForm()
 
@@ -80,6 +91,16 @@ export default function Version(props) {
   const socket = useSocket('build:info', buildinfo => {
     setModalContent(buildinfo)
   })
+
+  async function viewLog(version) {
+    setModalVisible(true)
+    const log = await get('/api/get-build-log', {
+      params: {
+        version
+      }
+    })
+    setModalContent(log)
+  }
 
   async function addNewVersion() {
     setVisible(true)
@@ -144,7 +165,7 @@ export default function Version(props) {
           新增版本
         </Button>
       </div>
-      <Table columns={columns}></Table>
+      <Table columns={columns} dataSource={props.data}></Table>
       <HighlightNoSSR
         modalVisible={modalVisible}
         modalContent={modalContent}
@@ -268,5 +289,5 @@ Version.getInitialProps = async ctx => {
       appid: ctx.query.appid
     }
   })
-  return { list: data || [] }
+  return { data: data || [] }
 }

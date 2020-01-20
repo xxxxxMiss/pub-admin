@@ -8,6 +8,7 @@ const session = require('koa-session')
 const MongooseStore = require('koa-session-mongoose')
 
 const logger = require('./middlewares/logger')
+const config = require('../config')
 
 const port = process.env.PORT || 8090
 const dev = process.env.NODE_ENV != 'production'
@@ -18,6 +19,7 @@ const connectMongo = require('./mongoose')
 
 require('../assets/js/create-socket-server')(server)
 
+app.config = config
 nextApp.prepare().then(() => {
   const router = new Router()
   app.use(logger())
