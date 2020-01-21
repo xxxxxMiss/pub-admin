@@ -1,7 +1,6 @@
 const fs = require('fs')
 const { spawn } = require('child_process')
 const path = require('path')
-const config = require('../../config')
 const logger = require('../js/log')()
 const error = error => {
   if (error) {
@@ -10,7 +9,7 @@ const error = error => {
 }
 const buildEvent = require('./socketio-event')
 
-module.exports = function build() {
+module.exports = function build(ctx) {
   return function(options) {
     return new Promise((resolve, reject) => {
       const { gitUrl, branch, buildTool, nodeVersion, name, stage } = options
@@ -19,16 +18,11 @@ module.exports = function build() {
         .replace('.git', '')
 
       const env = process.env.NODE_ENV || 'development'
-      let cwd = config.buildPath[env].repo.replace('$repo_name', repoName)
-      const buildLogPath = config.buildPath[env].log.replace(
-        '$repo_name',
-        repoName
-      )
+      const buildPath = ctx.app.config.buildPath[env]
+      let cwd = buildPath.repo.replace('$repo_name', repoName)
+      const buildLogPath = buildPath.log.replace('$repo_name', repoName)
       const logPath = path.join(buildLogPath, `${name}.log`)
-      const archiverPath = config.buildPath[env].archiver.replace(
-        '$repo_name',
-        repoName
-      )
+      const archiverPath = buildPath.archiver.replace('$repo_name', repoName)
 
       if (!fs.existsSync(buildLogPath)) {
         fs.mkdirSync(buildLogPath, { recursive: true })
@@ -55,6 +49,15 @@ module.exports = function build() {
       } else if (buildTool === 'yarn') {
         commands.push(`yarn build`)
       }
+      if (!fs.existsSync(archiverPath)) {
+        fs.mkdirSync(archiverPath, { recursive: true })
+      }
+      commands.push(
+        `tar -vczf ${path.join(archiverPath, stage)}.gzip ${path.join(
+          cwd,
+          'dist'
+        )}`
+      )
 
       const subprocess = spawn(commands.join(' && '), { cwd, shell: true })
       subprocess.stdout.on('data', data => {

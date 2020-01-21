@@ -12,7 +12,7 @@ export default function Hightlight(props) {
       onCancel={() => setModalVisible(false)}
       width="80%"
     >
-      <SyntaxHighlighter language="bash">
+      <SyntaxHighlighter language="shellsession">
         {modalContent || '(num) => num + 1'}
       </SyntaxHighlighter>
     </Modal>

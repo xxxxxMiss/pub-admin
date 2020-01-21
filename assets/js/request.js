@@ -46,12 +46,12 @@ function isomorphicRequest(ctx, options = {}) {
         }
       } else if (error.request) {
         if (!isServer) {
-          message.error(error.request)
+          message.error(error.request.message)
         } else {
-          logger.error(error.request)
+          logger.error(error.request.message)
         }
       } else {
-        logger.error(error)
+        logger.error(error.stack || error.message)
       }
     }
   )

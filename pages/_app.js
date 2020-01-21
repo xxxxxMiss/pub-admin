@@ -1,3 +1,4 @@
+import 'reset.css'
 import './_app.less'
 import '../assets/nprogress.css'
 

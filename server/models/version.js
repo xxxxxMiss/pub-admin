@@ -12,8 +12,7 @@ const versionSchema = new Schema({
     unique: true
   },
   gitUrl: {
-    type: String,
-    unique: true
+    type: String
   },
   name: String,
   remark: String,

@@ -1,0 +1,69 @@
+import { Button, Popover } from 'antd'
+import { DownloadOutlined } from '@ant-design/icons'
+
+export default function VersionPrecondition(props) {
+  return (
+    <ul className="version-precondition">
+      <li>
+        <span className="label">创建时间</span>
+        <span className="text">{props.createTime}</span>
+        <Popover
+          overlayClassName="download-zip"
+          trigger="hover"
+          content={
+            <div className="btn-group">
+              <Button type="primary">FAT</Button>
+              <Button type="primary">UAT</Button>
+              <Button type="primary">PRO</Button>
+            </div>
+          }
+          title="下载zip包"
+        >
+          <DownloadOutlined />
+        </Popover>
+      </li>
+      <li>
+        <span className="label">分支</span>
+        <span className="text">{props.branch}</span>
+      </li>
+      <li>
+        <span className="label">Git详情</span>
+        <span className="text">{props.gitUrl}</span>
+      </li>
+      <li>
+        <span className="label">Node版本</span>
+        <span className="text">{props.nodeVersion}</span>
+      </li>
+      <li>
+        <span className="label">打包工具</span>
+        <span className="text">{props.buildTool}</span>
+      </li>
+      <style jsx global>{`
+        .version-precondition {
+          padding: 15px 10px;
+          border-radius: 6px;
+          border: 1px solid #f0f0f0;
+        }
+        .version-precondition:hover {
+          transition: box-shadow 0.2s linear;
+          box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16),
+            0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09);
+        }
+        .version-precondition li {
+          padding: 5px;
+        }
+        .version-precondition .label {
+          font-size: 14px;
+          padding-right: 10px;
+        }
+        .version-precondition .text {
+          font-size: 12px;
+          color: rgba(0, 0, 0, 0.45);
+        }
+        .download-zip .btn-group .ant-btn + .ant-btn {
+          margin-left: 10px;
+        }
+      `}</style>
+    </ul>
+  )
+}

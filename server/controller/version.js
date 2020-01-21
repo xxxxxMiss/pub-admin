@@ -86,7 +86,7 @@ exports.createNewVersion = async ctx => {
     try {
       const stages = ['fat', 'uat', 'pro']
       for (let stage of stages) {
-        const { code } = await buildPackage(ctx.app)({ ...body, stage })
+        const { code } = await buildPackage(ctx)({ ...body, stage })
         if (code == 0) {
           const buildRst = await versionService.updateBuildStatus(
             res._id,

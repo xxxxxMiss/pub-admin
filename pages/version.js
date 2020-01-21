@@ -8,8 +8,8 @@ import {
   Select,
   Cascader,
   message,
-  Modal,
-  Table
+  Table,
+  Popover
 } from 'antd'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
@@ -17,8 +17,13 @@ import request, { get, post } from '@js/request'
 import dayjs from 'dayjs'
 import useSocket from '@hooks/useSocket'
 import dynamic from 'next/dynamic'
-
-import { LoadingOutlined, CheckCircleTwoTone } from '@ant-design/icons'
+import VersionPrecondition from '@components/VersionPrecondition'
+import VersionBuildStage from '@components/VersionBuildStage'
+import {
+  LoadingOutlined,
+  CheckCircleTwoTone,
+  DownloadOutlined
+} from '@ant-design/icons'
 
 const HighlightNoSSR = dynamic(() => import('@components/Highlight'), {
   ssr: false
@@ -29,17 +34,17 @@ export default function Version(props) {
     {
       title: '版本号',
       dataIndex: 'version',
-      width: '20%'
+      width: '10%'
     },
     {
       title: '版本号',
       dataIndex: 'version',
-      width: '20%'
+      width: '10%'
     },
     {
       title: '编译状态',
       dataIndex: 'status',
-      width: '20%',
+      width: '30%',
       render(text, record) {
         return (
           <Row gutter={15}>
@@ -87,6 +92,7 @@ export default function Version(props) {
   const [nodeVersions, setNodeVersions] = useState([])
   const [modalVisible, setModalVisible] = useState(false)
   const [modalContent, setModalContent] = useState('')
+  const [currentIndex, setCurrentIndex] = useState(0)
 
   const socket = useSocket('build:info', buildinfo => {
     setModalContent(buildinfo)
@@ -165,7 +171,15 @@ export default function Version(props) {
           新增版本
         </Button>
       </div>
-      <Table columns={columns} dataSource={props.data}></Table>
+      <Row gutter={10}>
+        <Col span={14}>
+          <Table columns={columns} dataSource={props.data}></Table>
+        </Col>
+        <Col span={10}>
+          <VersionPrecondition {...props.data[currentIndex]} />
+          <VersionBuildStage />
+        </Col>
+      </Row>
       <HighlightNoSSR
         modalVisible={modalVisible}
         modalContent={modalContent}
