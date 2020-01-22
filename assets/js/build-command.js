@@ -70,7 +70,7 @@ module.exports = function build(ctx) {
         fs.appendFile(logPath, data, error)
       })
       subprocess.on('close', (code, signal) => {
-        buildEvent.emit('build:end')
+        buildEvent.emit('build:end', signal)
         resolve(code, signal)
         // close socket.io
         if (signal) {
@@ -95,6 +95,9 @@ module.exports = function build(ctx) {
           `>>>>>>>build error>>>>>>>\r\n${error.toString()}`,
           error
         )
+      })
+      buildEvent.on('build:abort', () => {
+        subprocess.kill()
       })
     })
   }

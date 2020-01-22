@@ -1,7 +1,7 @@
 const { createUser, getUserByName, getUserById } = require('../service/user')
 const { getApplicationById } = require('../service/application')
 const shajs = require('sha.js')
-const { userJoiSchema } = require('../../assets/js/validation')
+const { userJoiSchema } = require('~js/validation')
 
 exports.login = async ctx => {
   const { name, password } = ctx.query

@@ -25,4 +25,5 @@ module.exports = router => {
   router.post('/api/create-new-version', checkLogin, version.createNewVersion)
   router.get('/api/get-pkg-list', checkLogin, version.getPkgList)
   router.get('/api/get-build-log', checkLogin, version.getBuildLog)
+  router.post('/api/abort-build', checkLogin, version.abortBuild)
 }

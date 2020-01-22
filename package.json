@@ -6,7 +6,12 @@
   "scripts": {
     "dev": "nodemon server/index.js",
     "build": "next build",
-    "start": "NODE_ENV=production node server/index.js"
+    "start": "NODE_ENV=production node server/index.js",
+    "preinstall": "command -v link-module-alias && link-module-alias clean || true",
+    "postinstall": "link-module-alias"
+  },
+  "_moduleAliases": {
+    "~js": "assets/js"
   },
   "keywords": [],
   "author": "xxxxxMiss <xxxxxmiss@gmail.com> (https://github.com/xxxxxMiss)",
@@ -47,6 +52,7 @@
   },
   "devDependencies": {
     "koa-logger": "^3.2.1",
+    "link-module-alias": "^1.2.0",
     "nodemon": "^2.0.2"
   }
 }

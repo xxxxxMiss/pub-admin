@@ -1,18 +1,19 @@
 const versionService = require('../service/version')
-const config = require('../../config')
-const { getNodeVersions } = require('../../assets/js/utils')
-const buildPackage = require('../../assets/js/build-command')
-const request = require('../../assets/js/request')
+const { getNodeVersions } = require('~js/utils')
+const buildPackage = require('~js/build-command')
+const request = require('~js/request')
 const fsPromise = require('fs').promises
 const path = require('path')
 const _ = require('lodash')
+const buildEvent = require('~js/socketio-event')
 
 exports.createVersion = async ctx => {
   const params = ctx.request.body
   const result = await versionService.createVersion(params)
-  if (result != null) {
+  if (result) {
     ctx.body = {
-      code: 0
+      code: 0,
+      data: result
     }
   } else {
     ctx.body = {
@@ -28,7 +29,7 @@ exports.getCreateBuildInfo = async ctx => {
   branches = await request(ctx, {
     baseURL: 'http://gitlab.dajiba.vip',
     headers: {
-      private_token: config.gitlab.accessToken
+      private_token: ctx.app.config.gitlab.accessToken
     }
   }).get(`/api/v4/projects/${projectId}/repository/branches`)
 
@@ -38,7 +39,7 @@ exports.getCreateBuildInfo = async ctx => {
       let commits = await request(ctx, {
         baseURL: 'http://gitlab.dajiba.vip',
         headers: {
-          private_token: config.gitlab.accessToken
+          private_token: ctx.app.config.gitlab.accessToken
         }
       }).get(
         `/api/v4/projects/${projectId}/repository/commits?refname=${name}&all=true`
@@ -61,6 +62,42 @@ exports.getCreateBuildInfo = async ctx => {
     }
   } else {
     ctx.status = 500
+  }
+}
+
+exports.getBranches = async ctx => {
+  const projectId = ctx.query.appid
+  const branches = await request(ctx, {
+    baseURL: 'http://gitlab.dajiba.vip',
+    headers: {
+      private_token: ctx.app.config.gitlab.accessToken
+    }
+  }).get(`/api/v4/projects/${projectId}/repository/branches`)
+
+  if (branches) {
+    ctx.body = {
+      code: 0,
+      data: branches
+    }
+  }
+}
+
+exports.getCommits = async ctx => {
+  const { appid: projectId, name } = ctx.query.appid
+  const commits = await request(ctx, {
+    baseURL: 'http://gitlab.dajiba.vip',
+    headers: {
+      private_token: ctx.app.config.gitlab.accessToken
+    }
+  }).get(
+    `/api/v4/projects/${projectId}/repository/commits?refname=${name}&all=true`
+  )
+
+  if (commits) {
+    ctx.body = {
+      code: 0,
+      data: commits
+    }
   }
 }
 
@@ -123,4 +160,18 @@ exports.getBuildLog = async ctx => {
     encoding: 'utf8'
   })
   ctx.body = text
+}
+
+exports.abortBuild = async ctx => {
+  buildEvent.on('build:end', signal => {
+    if (signal === 'SIGTERM') {
+      ctx.body = {
+        code: 0,
+        body: { signal }
+      }
+    } else {
+      ctx.status = 500
+    }
+  })
+  buildEvent.emit('build:abort')
 }
