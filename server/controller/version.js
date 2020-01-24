@@ -6,22 +6,7 @@ const fsPromise = require('fs').promises
 const path = require('path')
 const _ = require('lodash')
 const buildEvent = require('~js/socketio-event')
-
-exports.createVersion = async ctx => {
-  const params = ctx.request.body
-  const result = await versionService.createVersion(params)
-  if (result) {
-    ctx.body = {
-      code: 0,
-      data: result
-    }
-  } else {
-    ctx.body = {
-      code: 'CREATE_VERSION_FAILED',
-      message: '创建版本失败'
-    }
-  }
-}
+const { versionJoiSchema } = require('~js/validation')
 
 exports.getCreateBuildInfo = async ctx => {
   const projectId = ctx.query.appid
@@ -113,6 +98,12 @@ exports.createNewVersion = async ctx => {
   const body = ctx.request.body
   ctx.logger.info(body)
 
+  const { error } = await versionJoiSchema.validateAsync(body)
+  if (error) {
+    ctx.status = 400
+    ctx.message = error.message
+    return
+  }
   const res = await versionService.createNewVersion(body)
 
   if (res) {

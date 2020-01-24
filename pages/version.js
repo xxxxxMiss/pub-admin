@@ -24,6 +24,7 @@ import {
   CheckCircleTwoTone,
   DownloadOutlined
 } from '@ant-design/icons'
+import { versionJoiSchema } from '@js/validation'
 
 const HighlightNoSSR = dynamic(() => import('@components/Highlight'), {
   ssr: false
@@ -139,8 +140,16 @@ export default function Version(props) {
     const [branch, commit] = values.branch_commit
     values.branch = branch
     values.commit = commit
+    values.appid = router.query.appid
     Reflect.deleteProperty(values, 'branch_commit')
 
+    const { error } = versionJoiSchema.validate(values)
+    if (error) {
+      console.log(error.details)
+      return message.error(error.message)
+    }
+
+    confirm()
     const res = await post('/api/create-new-version', values)
     if (res) {
       message.success('新增版本成功')
@@ -161,7 +170,7 @@ export default function Version(props) {
       } else {
         socket.emit('build:info')
       }
-    }, 2500)
+    }, 1500)
   }
 
   return (
@@ -257,12 +266,7 @@ export default function Version(props) {
             <Button size="large" onClick={() => setVisible(false)}>
               取消
             </Button>
-            <Button
-              size="large"
-              type="primary"
-              htmlType="submit"
-              onClick={confirm}
-            >
+            <Button size="large" type="primary" htmlType="submit">
               确定
             </Button>
           </div>

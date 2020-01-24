@@ -12,3 +12,21 @@ exports.userJoiSchema = Joi.object({
     .required(),
   repeat_password: Joi.ref('password')
 }).with('password', 'repeat_password')
+
+exports.versionJoiSchema = Joi.object({
+  version: Joi.string().required(),
+  name: Joi.string()
+    .alphanum()
+    .required(),
+  nodeVersion: Joi.required(),
+  remark: Joi.string().max(200),
+  gitUrl: Joi.string()
+    .uri({
+      scheme: ['git', /git\+https?/, /https?/]
+    })
+    .required(),
+  branch: Joi.string().required(),
+  commit: Joi.string().required(),
+  buildTool: Joi.string().required(),
+  appid: Joi.number().required()
+})

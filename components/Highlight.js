@@ -13,7 +13,7 @@ export default function Hightlight(props) {
       width="80%"
     >
       <SyntaxHighlighter language="shellsession">
-        {modalContent || '(num) => num + 1'}
+        {modalContent || 'Waiting for building...'}
       </SyntaxHighlighter>
     </Modal>
   )

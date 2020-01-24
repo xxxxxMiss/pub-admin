@@ -21,7 +21,8 @@ const versionSchema = new Schema({
   branch: String,
   commit: String,
   appid: Number,
-  status: [String]
+  status: [String],
+  downloadUrl: [String]
 })
 
 module.exports = mongoose.model('Version', versionSchema)
