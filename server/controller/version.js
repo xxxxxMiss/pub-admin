@@ -104,31 +104,37 @@ exports.createNewVersion = async ctx => {
     ctx.message = error.message
     return
   }
-  const res = await versionService.createNewVersion(body)
+  const version = await versionService.createNewVersion(body)
 
-  if (res) {
+  if (version) {
     ctx.body = {
       code: 0,
-      data: res
+      data: version
     }
-    let i
+    let i = 0
     try {
       const stages = ['fat', 'uat', 'pro']
       for (; i < stages.length; ++i) {
-        const { code, signal } = await buildPackage(ctx)({ ...body, stage })
-        ctx.logger.log('[update doc] ', doc)
+        const { code, signal } = await buildPackage(ctx)({
+          ...body,
+          stage: stages[i]
+        })
         if (code == 0) {
-          res.status[i] = 'success'
-          await doc.save()
+          version.status[i] = 'success'
+          // TODO: save successfully, but not persist data to db
+          // await version.save()
+          await versionService.updateStatus(version._id, version.status)
         } else if (signal === 'SIGTERM') {
-          res.status[i] = 'aborted'
-          await doc.save()
+          version.status[i] = 'aborted'
+          await versionService.updateStatus(version._id, version.status)
+          break
         }
       }
     } catch (error) {
       ctx.logger.error(error)
-      res.status[i] = 'failed'
-      await res.save()
+      version.status[i] = 'failed'
+      await versionService.updateStatus(version._id, version.status)
+      // await version.save()
     }
   }
 }

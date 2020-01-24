@@ -12,8 +12,8 @@ exports.findById = (id, projection) => {
   return Version.find({ _id: id }, projection).exec()
 }
 
-exports.updateById = (id, doc) => {
-  return Version.update({ _id: id }, doc)
+exports.updateStatus = (id, status) => {
+  return Version.update({ _id: id }, { $set: { status } })
 }
 
 exports.updateBuildStatus = (id, status) => {

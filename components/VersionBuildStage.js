@@ -1,3 +1,4 @@
+import React, { useState } from 'react'
 import {
   LoadingOutlined,
   CheckCircleTwoTone,
@@ -8,8 +9,13 @@ import { Tag, Switch, Button } from 'antd'
 import { post } from '@js/request'
 
 export default function VersionBuildStage(props) {
+  const [isAborted, setIsAborted] = useState(props.isAborted)
+
   async function abortBuild() {
-    await post('/api/abort-build')
+    if (!isAborted) {
+      const rst = await post('/api/abort-build')
+      rst && setIsAborted(true)
+    }
   }
 
   return (
@@ -26,7 +32,13 @@ export default function VersionBuildStage(props) {
               版本编译
             </span>
             <span>
-              <Button type="primary" size="small" danger onClick={abortBuild}>
+              <Button
+                type="primary"
+                disabled={isAborted}
+                size="small"
+                danger
+                onClick={abortBuild}
+              >
                 终止编译
               </Button>
               <span className="gutter">查看编译日志</span>

@@ -29,8 +29,4 @@ const versionSchema = new Schema({
   downloadUrl: [String]
 })
 
-versionSchema.pre('update', async function() {
-  console.log('-------', this)
-})
-
 module.exports = mongoose.model('Version', versionSchema)

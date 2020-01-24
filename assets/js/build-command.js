@@ -70,29 +70,23 @@ module.exports = function build(ctx) {
         fs.appendFile(logPath, data, error)
       })
       subprocess.on('close', (code, signal) => {
+        ctx.logger.info('build close: ', code, signal)
         buildEvent.emit('build:end', signal)
-        resolve(code, signal)
+        resolve({ code, signal })
         // close socket.io
-        if (signal) {
-          fs.appendFile(
-            logPath,
-            `>>>>>>>build end with signal: ${signal}>>>>>>`,
-            error
-          )
-        } else {
-          fs.appendFile(
-            logPath,
-            `>>>>>>>build end with code: ${code}>>>>>>`,
-            error
-          )
-        }
+        fs.appendFile(
+          logPath,
+          `>>>>>>>build end with ${signal ? 'signal' : 'code'}: ${signal ||
+            code}<<<<<<<\r\n\r\n`,
+          error
+        )
       })
       subprocess.on('error', error => {
         buildEvent.emit('build:error')
         reject(error)
         fs.appendFile(
           logPath,
-          `>>>>>>>build error>>>>>>>\r\n${error.toString()}`,
+          `>>>>>>>build error>>>>>>>\r\n\r\n${error.toString()}`,
           error
         )
       })

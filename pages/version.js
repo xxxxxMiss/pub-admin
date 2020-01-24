@@ -22,7 +22,9 @@ import VersionBuildStage from '@components/VersionBuildStage'
 import {
   LoadingOutlined,
   CheckCircleTwoTone,
-  DownloadOutlined
+  DownloadOutlined,
+  PauseOutlined,
+  WarningOutlined
 } from '@ant-design/icons'
 import { versionJoiSchema } from '@js/validation'
 
@@ -35,32 +37,45 @@ export default function Version(props) {
     {
       title: '版本号',
       dataIndex: 'version',
-      width: '10%'
+      width: '20%',
+      className: 'wrap-column'
     },
     {
       title: '版本号',
       dataIndex: 'version',
-      width: '10%'
+      width: '20%',
+      className: 'wrap-column'
     },
     {
       title: '编译状态',
       dataIndex: 'status',
       width: '30%',
       render(text, record) {
+        const status = [...record.status, ...new Array(3).fill(0)].slice(0, 3)
         return (
           <Row gutter={15}>
-            <Col>
-              <p>FAT</p>
-              <LoadingOutlined />
-            </Col>
-            <Col>
+            {status.map((s, i) => (
+              <Col key={i}>
+                <p>{i === 0 ? 'FAT' : i === 1 ? 'UAT' : 'PRO'}</p>
+                {s === 0 ? (
+                  <LoadingOutlined />
+                ) : s === 'sucess' ? (
+                  <CheckCircleTwoTone />
+                ) : s === 'aborted' ? (
+                  <PauseOutlined />
+                ) : (
+                  <WarningOutlined />
+                )}
+              </Col>
+            ))}
+            {/* <Col>
               <p>UAT</p>
               <LoadingOutlined />
             </Col>
             <Col>
               <p>PRO</p>
               <LoadingOutlined />
-            </Col>
+            </Col> */}
           </Row>
         )
       }
@@ -273,7 +288,8 @@ export default function Version(props) {
         </Form>
       </Drawer>
       <style jsx global>{`
-        .page-version {
+        .page-version .wrap-column {
+          word-break: break-all;
         }
         .version-drawer .commit-msg {
           margin-top: 10px;
