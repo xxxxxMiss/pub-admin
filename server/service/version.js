@@ -8,6 +8,14 @@ exports.removeVersionById = id => {
   return Version.findByIdAndRemove(id).exec()
 }
 
+exports.findById = (id, projection) => {
+  return Version.find({ _id: id }, projection).exec()
+}
+
+exports.updateById = (id, doc) => {
+  return Version.update({ _id: id }, doc)
+}
+
 exports.updateBuildStatus = (id, status) => {
   // Promise<{n, nModified}>
   return Version.update(

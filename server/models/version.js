@@ -3,7 +3,11 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const versionSchema = new Schema({
-  createTime: {
+  createAt: {
+    type: Date,
+    default: Date.now()
+  },
+  updateAt: {
     type: Date,
     default: Date.now()
   },
@@ -23,6 +27,10 @@ const versionSchema = new Schema({
   appid: Number,
   status: [String],
   downloadUrl: [String]
+})
+
+versionSchema.pre('update', async function() {
+  console.log('-------', this)
 })
 
 module.exports = mongoose.model('Version', versionSchema)

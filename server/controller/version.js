@@ -111,21 +111,24 @@ exports.createNewVersion = async ctx => {
       code: 0,
       data: res
     }
+    let i
     try {
       const stages = ['fat', 'uat', 'pro']
-      for (let stage of stages) {
-        const { code } = await buildPackage(ctx)({ ...body, stage })
+      for (; i < stages.length; ++i) {
+        const { code, signal } = await buildPackage(ctx)({ ...body, stage })
+        ctx.logger.log('[update doc] ', doc)
         if (code == 0) {
-          const buildRst = await versionService.updateBuildStatus(
-            res._id,
-            'success'
-          )
-          ctx.logger.info('[build result] ', buildRst)
+          res.status[i] = 'success'
+          await doc.save()
+        } else if (signal === 'SIGTERM') {
+          res.status[i] = 'aborted'
+          await doc.save()
         }
       }
     } catch (error) {
       ctx.logger.error(error)
-      await versionService.updateBuildStatus(res._id, 'failed')
+      res.status[i] = 'failed'
+      await res.save()
     }
   }
 }
