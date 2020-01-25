@@ -12,8 +12,8 @@ exports.findById = (id, projection) => {
   return Version.find({ _id: id }, projection).exec()
 }
 
-exports.updateStatus = (id, status) => {
-  return Version.update({ _id: id }, { $set: { status } })
+exports.updateFieldsById = (id, fields) => {
+  return Version.update({ _id: id }, { $set: fields })
 }
 
 exports.updateBuildStatus = (id, status) => {
@@ -31,7 +31,8 @@ exports.getPkgList = params => {
   const { page, pageSize, appid } = params
   const options = {
     limit: pageSize,
-    skip: (page - 1) * pageSize
+    skip: (page - 1) * pageSize,
+    sort: '-createAt'
   }
   return Version.find({ appid }, null, options).exec()
 }

@@ -25,7 +25,10 @@ const versionSchema = new Schema({
   branch: String,
   commit: String,
   appid: Number,
-  status: [String],
+  status: {
+    type: [String],
+    default: ['empty', 'empty', 'empty']
+  },
   downloadUrl: [String]
 })
 

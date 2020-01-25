@@ -41,8 +41,8 @@ export default function Version(props) {
       className: 'wrap-column'
     },
     {
-      title: '版本号',
-      dataIndex: 'version',
+      title: '版本名称',
+      dataIndex: 'name',
       width: '20%',
       className: 'wrap-column'
     },
@@ -51,7 +51,7 @@ export default function Version(props) {
       dataIndex: 'status',
       width: '30%',
       render(text, record) {
-        const status = [...record.status, ...new Array(3).fill(0)].slice(0, 3)
+        const status = record.status
         return (
           <Row gutter={15}>
             {status.map((s, i) => (
@@ -59,10 +59,12 @@ export default function Version(props) {
                 <p>{i === 0 ? 'FAT' : i === 1 ? 'UAT' : 'PRO'}</p>
                 {s === 0 ? (
                   <LoadingOutlined />
-                ) : s === 'sucess' ? (
+                ) : s === 'success' ? (
                   <CheckCircleTwoTone />
                 ) : s === 'aborted' ? (
                   <PauseOutlined />
+                ) : s === 'empty' ? (
+                  '-'
                 ) : (
                   <WarningOutlined />
                 )}
@@ -143,8 +145,6 @@ export default function Version(props) {
 
   const [commitMsg, setCommitMsg] = useState('')
   function handleBranchChange(value, options) {
-    console.log(value)
-    console.log(value)
     setCommitMsg(options[1]?.message || '')
     form.setFieldsValue({
       branch_commit: value
@@ -197,11 +197,25 @@ export default function Version(props) {
       </div>
       <Row gutter={10}>
         <Col span={14}>
-          <Table columns={columns} dataSource={props.data}></Table>
+          <Table
+            onRow={(_, index) => {
+              return {
+                onClick: () => {
+                  setCurrentIndex(index)
+                }
+              }
+            }}
+            rowClassName={(_, index) => {
+              return currentIndex === index ? 'row-selected' : ''
+            }}
+            columns={columns}
+            dataSource={props.data}
+            // scroll={{ y: 500 }}
+          ></Table>
         </Col>
         <Col span={10}>
           <VersionPrecondition {...props.data[currentIndex]} />
-          <VersionBuildStage />
+          <VersionBuildStage {...props.data[currentIndex]} />
         </Col>
       </Row>
       <HighlightNoSSR
@@ -290,6 +304,9 @@ export default function Version(props) {
       <style jsx global>{`
         .page-version .wrap-column {
           word-break: break-all;
+        }
+        .page-version .row-selected > td {
+          background-color: #f5f5f5;
         }
         .version-drawer .commit-msg {
           margin-top: 10px;

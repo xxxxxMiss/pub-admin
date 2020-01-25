@@ -53,7 +53,7 @@ module.exports = function build(ctx) {
         fs.mkdirSync(archiverPath, { recursive: true })
       }
       commands.push(
-        `tar -vczf ${path.join(archiverPath, stage)}.gzip ${path.join(
+        `tar -vczf ${path.join(archiverPath, stage)}.${name}.gzip ${path.join(
           cwd,
           'dist'
         )}`

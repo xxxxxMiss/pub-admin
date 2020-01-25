@@ -20,9 +20,11 @@ export default function VersionPrecondition(props) {
             trigger="hover"
             content={
               <div className="btn-group">
-                <Button type="primary">FAT</Button>
-                <Button type="primary">UAT</Button>
-                <Button type="primary">PRO</Button>
+                {props.downloadUrl.map((url, index) => (
+                  <Button type="link" href={url} key={url} download>
+                    {index === 0 ? 'FAT' : index === 1 ? 'UAT' : 'PRO'}
+                  </Button>
+                ))}
               </div>
             }
             title="下载zip包"

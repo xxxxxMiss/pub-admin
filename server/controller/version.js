@@ -112,8 +112,10 @@ exports.createNewVersion = async ctx => {
       data: version
     }
     let i = 0
+    let archiverPath =
+      ctx.app.config.buildPath[process.env.NODE_ENV || 'development'].archiver
+    const stages = ['fat', 'uat', 'pro']
     try {
-      const stages = ['fat', 'uat', 'pro']
       for (; i < stages.length; ++i) {
         const { code, signal } = await buildPackage(ctx)({
           ...body,
@@ -121,19 +123,31 @@ exports.createNewVersion = async ctx => {
         })
         if (code == 0) {
           version.status[i] = 'success'
+          version.downloadUrl[i] = `${archiverPath}/${stages[i]}.gzip`
           // TODO: save successfully, but not persist data to db
           // await version.save()
-          await versionService.updateStatus(version._id, version.status)
+          await versionService.updateFieldsById(version._id, {
+            status: version.status,
+            downloadUrl: path.relative(process.cwd(), version.downloadUrl[i])
+          })
         } else if (signal === 'SIGTERM') {
           version.status[i] = 'aborted'
-          await versionService.updateStatus(version._id, version.status)
+          version.downloadUrl[i] = `${archiverPath}/${stages[i]}.gzip`
+          await versionService.updateFieldsById(version._id, {
+            status: version.status,
+            downloadUrl: path.relative(process.cwd(), version.downloadUrl[i])
+          })
           break
         }
       }
     } catch (error) {
       ctx.logger.error(error)
       version.status[i] = 'failed'
-      await versionService.updateStatus(version._id, version.status)
+      version.downloadUrl[i] = `${archiverPath}/${stages[i]}.gzip`
+      await versionService.updateFieldsById(version._id, {
+        status: version.status,
+        downloadUrl: path.relative(process.cwd(), version.downloadUrl[i])
+      })
       // await version.save()
     }
   }

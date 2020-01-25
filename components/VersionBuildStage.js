@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   LoadingOutlined,
   CheckCircleTwoTone,
@@ -9,7 +9,11 @@ import { Tag, Switch, Button } from 'antd'
 import { post } from '@js/request'
 
 export default function VersionBuildStage(props) {
-  const [isAborted, setIsAborted] = useState(props.isAborted)
+  const [isAborted, setIsAborted] = useState(false)
+
+  useEffect(() => {
+    setIsAborted(props.status.includes('aborted'))
+  })
 
   async function abortBuild() {
     if (!isAborted) {
