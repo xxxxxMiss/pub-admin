@@ -10,16 +10,17 @@ import {
   message,
   Table
 } from 'antd'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import request, { get, post } from '@js/request'
 import dayjs from 'dayjs'
-import useSocket from '@hooks/useSocket'
+// import useSocket from '@hooks/useSocket'
 import VersionPrecondition from '@components/VersionPrecondition'
 import VersionBuildStage from '@components/VersionBuildStage'
 import {
   LoadingOutlined,
   CheckCircleTwoTone,
+  CheckOutlined,
   DownloadOutlined,
   PauseOutlined,
   WarningOutlined
@@ -51,10 +52,10 @@ export default function Version(props) {
             {status.map((s, i) => (
               <Col key={i}>
                 <p>{i === 0 ? 'FAT' : i === 1 ? 'UAT' : 'PRO'}</p>
-                {s === 0 ? (
+                {s === 'building' ? (
                   <LoadingOutlined />
                 ) : s === 'success' ? (
-                  <CheckCircleTwoTone />
+                  <CheckOutlined />
                 ) : s === 'aborted' ? (
                   <PauseOutlined />
                 ) : s === 'empty' ? (
@@ -78,7 +79,8 @@ export default function Version(props) {
     },
     {
       title: '创建人',
-      dataIndex: ['publisher', 'name']
+      dataIndex: ['publisher', 'name'],
+      key: 'publisher'
     }
   ]
   const router = useRouter()
@@ -89,9 +91,9 @@ export default function Version(props) {
   const [nodeVersions, setNodeVersions] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  const socket = useSocket('build:info', buildinfo => {
-    // setModalContent(buildinfo)
-  })
+  // const socket = useSocket('build:info', buildinfo => {
+  // setModalContent(buildinfo)
+  // })
 
   async function addNewVersion() {
     setVisible(true)
@@ -119,6 +121,7 @@ export default function Version(props) {
   }
 
   async function onFinish(values) {
+    setVisible(false)
     const [branch, commit] = values.branch_commit
     values.branch = branch
     values.commit = commit
@@ -131,18 +134,18 @@ export default function Version(props) {
       return message.error(error.message)
     }
 
-    confirm()
+    // confirm()
     const res = await post('/api/create-new-version', values)
     if (res) {
       message.success('新增版本成功')
     }
   }
 
-  let end = false
-  useSocket('build:end', () => {
-    end = true
-    socket.close()
-  })
+  // let end = false
+  // useSocket('build:end', () => {
+  //   end = true
+  //   socket.close()
+  // })
   function confirm() {
     setVisible(false)
     const interval = setInterval(() => {
@@ -153,6 +156,21 @@ export default function Version(props) {
       }
     }, 1500)
   }
+
+  const [data, setData] = useState(props.data)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // TODO: add pagination
+      get('/api/get-pkg-list', {
+        params: {
+          appid: router.query.appid
+        }
+      }).then(list => {
+        setData(list)
+      })
+    }, 4000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <div className="page-version">
@@ -175,15 +193,15 @@ export default function Version(props) {
               return currentIndex === index ? 'row-selected' : ''
             }}
             columns={columns}
-            dataSource={props.data}
+            dataSource={data}
             // scroll={{ y: 500 }}
           ></Table>
         </Col>
         <Col span={10}>
-          {props.data.length > 0 && (
+          {data.length > 0 && (
             <>
-              <VersionPrecondition {...props.data[currentIndex]} />
-              <VersionBuildStage {...props.data[currentIndex]} />
+              <VersionPrecondition {...data[currentIndex]} />
+              <VersionBuildStage {...data[currentIndex]} />
             </>
           )}
         </Col>
