@@ -1,6 +1,5 @@
 const versionService = require('../service/version')
-const { getNodeVersions } = require('~js/utils')
-const buildPackage = require('~js/build-command')
+const { getNodeVersions, updateBuildInfo } = require('~js/utils')
 const request = require('~js/request')
 const fsPromise = require('fs').promises
 const path = require('path')
@@ -104,52 +103,18 @@ exports.createNewVersion = async ctx => {
     ctx.message = error.message
     return
   }
-  const version = await versionService.createNewVersion(body)
+  const version = await versionService.createNewVersion({
+    ...body,
+    publisher: ctx.session.user._id
+  })
 
   if (version) {
     ctx.body = {
       code: 0,
       data: version
     }
-    let i = 0
-    let archiverPath =
-      ctx.app.config.buildPath[process.env.NODE_ENV || 'development'].archiver
-    const stages = ['fat', 'uat', 'pro']
-    try {
-      for (; i < stages.length; ++i) {
-        const { code, signal } = await buildPackage(ctx)({
-          ...body,
-          stage: stages[i]
-        })
-        if (code == 0) {
-          version.status[i] = 'success'
-          version.downloadUrl[i] = `${archiverPath}/${stages[i]}.gzip`
-          // TODO: save successfully, but not persist data to db
-          // await version.save()
-          await versionService.updateFieldsById(version._id, {
-            status: version.status,
-            downloadUrl: path.relative(process.cwd(), version.downloadUrl[i])
-          })
-        } else if (signal === 'SIGTERM') {
-          version.status[i] = 'aborted'
-          version.downloadUrl[i] = `${archiverPath}/${stages[i]}.gzip`
-          await versionService.updateFieldsById(version._id, {
-            status: version.status,
-            downloadUrl: path.relative(process.cwd(), version.downloadUrl[i])
-          })
-          break
-        }
-      }
-    } catch (error) {
-      ctx.logger.error(error)
-      version.status[i] = 'failed'
-      version.downloadUrl[i] = `${archiverPath}/${stages[i]}.gzip`
-      await versionService.updateFieldsById(version._id, {
-        status: version.status,
-        downloadUrl: path.relative(process.cwd(), version.downloadUrl[i])
-      })
-      // await version.save()
-    }
+
+    updateBuildInfo(ctx, version)
   }
 }
 
@@ -167,7 +132,7 @@ exports.getPkgList = async ctx => {
 exports.getBuildLog = async ctx => {
   const logPath = _.get(
     ctx.app.config,
-    `buildPath.${process.env.NODE_ENV || 'development'}.log`
+    `build.${process.env.NODE_ENV || 'development'}.log`
   )
   const version = ctx.query.version
   const text = await fsPromise.readFile(path.join(logPath, `${version}.log`), {

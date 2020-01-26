@@ -20,7 +20,7 @@ export default function VersionPrecondition(props) {
             trigger="hover"
             content={
               <div className="btn-group">
-                {props.downloadUrl.map((url, index) => (
+                {(props.downloadUrl || []).map((url, index) => (
                   <Button type="link" href={url} key={url} download>
                     {index === 0 ? 'FAT' : index === 1 ? 'UAT' : 'PRO'}
                   </Button>

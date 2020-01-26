@@ -44,7 +44,11 @@ mail_opts:
 gitlab:
   accessToken: T_of3zf2Jon4mxMwxcRa
 
-buildPath:
+build:
+  stages:
+    - fat
+    - uat
+    - pro
   development:
     repo: /Users/qsch/test__xx
     log: /Users/qsch/test__xx/build_log

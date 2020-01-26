@@ -1,4 +1,5 @@
 const Version = require('../models/version')
+const buildPackage = require('~js/build-command')
 
 exports.createNewVersion = params => {
   return Version.create(params)
@@ -34,5 +35,7 @@ exports.getPkgList = params => {
     skip: (page - 1) * pageSize,
     sort: '-createAt'
   }
-  return Version.find({ appid }, null, options).exec()
+  return Version.find({ appid }, null, options)
+    .populate('publisher', ['name'])
+    .exec()
 }

@@ -18,7 +18,7 @@ module.exports = function build(ctx) {
         .replace('.git', '')
 
       const env = process.env.NODE_ENV || 'development'
-      const buildPath = ctx.app.config.buildPath[env]
+      const buildPath = ctx.app.config.build[env]
       let cwd = buildPath.repo.replace('$repo_name', repoName)
       const buildLogPath = buildPath.log.replace('$repo_name', repoName)
       const logPath = path.join(buildLogPath, `${name}.log`)

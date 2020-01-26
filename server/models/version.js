@@ -29,7 +29,11 @@ const versionSchema = new Schema({
     type: [String],
     default: ['empty', 'empty', 'empty']
   },
-  downloadUrl: [String]
+  downloadUrl: [String],
+  publisher: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }
 })
 
 module.exports = mongoose.model('Version', versionSchema)

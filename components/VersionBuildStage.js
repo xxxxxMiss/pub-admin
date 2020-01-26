@@ -6,13 +6,20 @@ import {
   FileTextOutlined
 } from '@ant-design/icons'
 import { Tag, Switch, Button } from 'antd'
-import { post } from '@js/request'
+import { post, get } from '@js/request'
+import dynamic from 'next/dynamic'
+
+const HighlightNoSSR = dynamic(() => import('@components/Highlight'), {
+  ssr: false
+})
 
 export default function VersionBuildStage(props) {
   const [isAborted, setIsAborted] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalContent, setModalContent] = useState('')
 
   useEffect(() => {
-    setIsAborted(props.status.includes('aborted'))
+    setIsAborted((props.status || []).includes('aborted'))
   })
 
   async function abortBuild() {
@@ -22,8 +29,23 @@ export default function VersionBuildStage(props) {
     }
   }
 
+  async function viewLog() {
+    setModalVisible(true)
+    const log = await get('/api/get-build-log', {
+      params: {
+        version: props.version
+      }
+    })
+    setModalContent(log)
+  }
+
   return (
     <div className="version-build-stage">
+      <HighlightNoSSR
+        modalVisible={modalVisible}
+        modalContent={modalContent}
+        setModalVisible={setModalVisible}
+      />
       <div className="block-title">
         <OrderedListOutlined />
         版本状态/发布步骤
@@ -46,7 +68,7 @@ export default function VersionBuildStage(props) {
                 终止编译
               </Button>
               <span className="gutter">查看编译日志</span>
-              <FileTextOutlined />
+              <FileTextOutlined onClick={viewLog} />
             </span>
           </h3>
           <div className="item-content"></div>
@@ -56,7 +78,7 @@ export default function VersionBuildStage(props) {
           <div className="item-content">
             <Tag color="success">{props.publishStatus}</Tag>
             <span>
-              {props.publisher}
+              {props.publisher.name}
               {props.publishDate}
             </span>
           </div>
@@ -72,7 +94,7 @@ export default function VersionBuildStage(props) {
           <div className="item-content">
             <Tag color="success">{props.publishStatus}</Tag>
             <span>
-              {props.publisher}
+              {props.publisher.name}
               {props.publishDate}
             </span>
           </div>

@@ -8,15 +8,13 @@ import {
   Select,
   Cascader,
   message,
-  Table,
-  Popover
+  Table
 } from 'antd'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import request, { get, post } from '@js/request'
 import dayjs from 'dayjs'
 import useSocket from '@hooks/useSocket'
-import dynamic from 'next/dynamic'
 import VersionPrecondition from '@components/VersionPrecondition'
 import VersionBuildStage from '@components/VersionBuildStage'
 import {
@@ -28,28 +26,24 @@ import {
 } from '@ant-design/icons'
 import { versionJoiSchema } from '@js/validation'
 
-const HighlightNoSSR = dynamic(() => import('@components/Highlight'), {
-  ssr: false
-})
-
 export default function Version(props) {
   const columns = [
     {
       title: '版本号',
       dataIndex: 'version',
-      width: '20%',
+      width: '18%',
       className: 'wrap-column'
     },
     {
       title: '版本名称',
       dataIndex: 'name',
-      width: '20%',
+      width: '18%',
       className: 'wrap-column'
     },
     {
       title: '编译状态',
       dataIndex: 'status',
-      width: '30%',
+      width: '28%',
       render(text, record) {
         const status = record.status
         return (
@@ -70,14 +64,6 @@ export default function Version(props) {
                 )}
               </Col>
             ))}
-            {/* <Col>
-              <p>UAT</p>
-              <LoadingOutlined />
-            </Col>
-            <Col>
-              <p>PRO</p>
-              <LoadingOutlined />
-            </Col> */}
           </Row>
         )
       }
@@ -86,20 +72,13 @@ export default function Version(props) {
       title: 'FAT',
       dataIndex: 'FAT',
       width: '20%',
-      render(text, record) {
+      render() {
         return <CheckCircleTwoTone />
       }
     },
     {
-      title: '操作',
-      dataIndex: 'action',
-      render(text, record) {
-        return (
-          <Button type="ghost" onClick={() => viewLog(record.version)}>
-            查看日志
-          </Button>
-        )
-      }
+      title: '创建人',
+      dataIndex: ['publisher', 'name']
     }
   ]
   const router = useRouter()
@@ -108,23 +87,11 @@ export default function Version(props) {
   const [visible, setVisible] = useState(false)
   const [buildInfo, setBuildInfo] = useState([])
   const [nodeVersions, setNodeVersions] = useState([])
-  const [modalVisible, setModalVisible] = useState(false)
-  const [modalContent, setModalContent] = useState('')
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const socket = useSocket('build:info', buildinfo => {
-    setModalContent(buildinfo)
+    // setModalContent(buildinfo)
   })
-
-  async function viewLog(version) {
-    setModalVisible(true)
-    const log = await get('/api/get-build-log', {
-      params: {
-        version
-      }
-    })
-    setModalContent(log)
-  }
 
   async function addNewVersion() {
     setVisible(true)
@@ -178,7 +145,6 @@ export default function Version(props) {
   })
   function confirm() {
     setVisible(false)
-    setModalVisible(true)
     const interval = setInterval(() => {
       if (end) {
         clearInterval(interval)
@@ -214,15 +180,14 @@ export default function Version(props) {
           ></Table>
         </Col>
         <Col span={10}>
-          <VersionPrecondition {...props.data[currentIndex]} />
-          <VersionBuildStage {...props.data[currentIndex]} />
+          {props.data.length > 0 && (
+            <>
+              <VersionPrecondition {...props.data[currentIndex]} />
+              <VersionBuildStage {...props.data[currentIndex]} />
+            </>
+          )}
         </Col>
       </Row>
-      <HighlightNoSSR
-        modalVisible={modalVisible}
-        modalContent={modalContent}
-        setModalVisible={setModalVisible}
-      />
       <Drawer
         visible={visible}
         closable
