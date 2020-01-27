@@ -11,7 +11,16 @@ exports.list = async ctx => {
   }
 }
 
-// exports.put = async ctx => {
-//   const { name, file }
-//   await ctx.ossClient.put()
-// }
+exports.put = async ctx => {
+  const { originalname, buffer } = ctx.request.file
+  const result = await ctx.ossClient.put(originalname, buffer)
+  if (result) {
+    ctx.body = {
+      code: 0,
+      data: result
+    }
+  } else {
+    ctx.status = 500
+    ctx.message = 'Put file to ali oss failed'
+  }
+}
