@@ -1,8 +1,10 @@
 const user = require('./controller/user')
 const application = require('./controller/application')
 const version = require('./controller/version')
+const oss = require('./controller/oss')
 
 const checkLogin = require('./middlewares/checkLogin')
+const getOssClient = require('./middlewares/getOssClient')
 
 module.exports = router => {
   router.get('/api/login', user.login)
@@ -26,4 +28,5 @@ module.exports = router => {
   router.get('/api/get-pkg-list', checkLogin, version.getPkgList)
   router.get('/api/get-build-log', checkLogin, version.getBuildLog)
   router.post('/api/abort-build', checkLogin, version.abortBuild)
+  router.get('/api/get-oss-list', getOssClient(), oss.list)
 }
