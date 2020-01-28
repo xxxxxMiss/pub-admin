@@ -1,6 +1,6 @@
 const getLogger = require('../../assets/js/log')
 const log4jsLogger = getLogger()
-const ms = require('ms')
+const ms = require('pretty-ms')
 
 function logger() {
   return async (ctx, next) => {

@@ -29,11 +29,24 @@ const versionSchema = new Schema({
     type: [String],
     default: ['empty', 'empty', 'empty']
   },
+  buildAt: {
+    type: [
+      {
+        start: Date,
+        end: Date
+      }
+    ]
+  },
   downloadUrl: [String],
   publisher: {
     type: Schema.Types.ObjectId,
     ref: 'User'
   }
+})
+
+versionSchema.pre('save', function(next) {
+  this.updateAt = Date.now()
+  next()
 })
 
 module.exports = mongoose.model('Version', versionSchema)

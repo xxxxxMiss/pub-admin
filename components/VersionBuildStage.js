@@ -3,11 +3,15 @@ import {
   LoadingOutlined,
   CheckCircleTwoTone,
   OrderedListOutlined,
-  FileTextOutlined
+  FileTextOutlined,
+  FieldTimeOutlined,
+  ClockCircleOutlined
 } from '@ant-design/icons'
 import { Tag, Switch, Button } from 'antd'
 import { post, get } from '@js/request'
 import dynamic from 'next/dynamic'
+import dayjs from 'dayjs'
+import ms from 'pretty-ms'
 
 const HighlightNoSSR = dynamic(() => import('@components/Highlight'), {
   ssr: false
@@ -71,7 +75,35 @@ export default function VersionBuildStage(props) {
               <FileTextOutlined onClick={viewLog} />
             </span>
           </h3>
-          <div className="item-content"></div>
+          <div className="item-content">
+            {['FAT', 'UAT', 'PRO'].map((text, i) => (
+              <div key={text} className="item-row">
+                <span>{text}</span>
+                {props.status?.[i] === 'building' ? (
+                  <LoadingOutlined />
+                ) : (
+                  props.buildAt?.[i] && (
+                    <>
+                      <span className="end-time">
+                        <ClockCircleOutlined />
+                        {dayjs(props.buildAt[i]?.end).format(
+                          'YYYY-MM-DD HH:mm:ss'
+                        )}
+                      </span>
+                      <span>
+                        <FieldTimeOutlined />
+                        {ms(
+                          dayjs(props.buildAt[i].end).valueOf() -
+                            dayjs(props.buildAt[i]?.start).valueOf(),
+                          { secondsDecimalDigits: 0 }
+                        )}
+                      </span>
+                    </>
+                  )
+                )}
+              </div>
+            ))}
+          </div>
         </li>
         <li className="item">
           <h3 className="title">FAT</h3>
@@ -103,6 +135,15 @@ export default function VersionBuildStage(props) {
       <style jsx global>{`
         .version-build-stage {
           font-size: 14px;
+        }
+        .version-build-stage .item-row {
+          padding: 10px 0 2px 0;
+        }
+        .version-build-stage .end-time {
+          display: inline-block;
+          padding-right: 10px;
+          padding-left: 15px;
+          min-width: 200px;
         }
         .version-build-stage .gutter {
           padding: 0 10px;
@@ -136,6 +177,7 @@ export default function VersionBuildStage(props) {
         }
         .version-build-stage .item-content {
           padding-left: 30px;
+          padding-top: 15px;
         }
       `}</style>
     </div>

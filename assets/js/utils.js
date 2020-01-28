@@ -26,29 +26,37 @@ exports.updateBuildInfo = async function updateBuildInfo(ctx, version) {
 
   try {
     for (; i < stages.length; ++i) {
-      version.status[i] = 'building'
-      version.markModified('status')
-      await version.save()
+      await updateFields(version, i, 'building')
 
       const { code, signal } = await buildPackage(ctx)({
         ...ctx.request.body,
         stage: stages[i]
       })
       if (code == 0) {
-        version.status[i] = 'success'
         version.downloadUrl[i] = `${archiverPath}/${stages[i]}.gzip`
         version.markModified('downloadUrl')
-        version.markModified('status')
-        await version.save()
+        await updateFields(version, i, 'success')
       } else if (signal === 'SIGTERM') {
-        version.status[i] = 'aborted'
-        await version.save()
+        await updateFields(version, i, 'aborted')
         break
       }
     }
   } catch (error) {
     ctx.logger.error(error)
-    version.status[i] = 'failed'
-    await version.save()
+    await updateFields(version, i, 'failed')
   }
+}
+
+async function updateFields(doc, i, status) {
+  doc.status[i] = status
+  doc.markModified('status')
+  if (status === 'building') {
+    doc.buildAt[i] = {
+      start: Date.now()
+    }
+  } else {
+    doc.$set(`buildAt.${i}.end`, Date.now())
+  }
+  doc.markModified('buildAt')
+  await doc.save()
 }
