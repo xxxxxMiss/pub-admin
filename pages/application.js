@@ -17,9 +17,9 @@ import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { useRouter } from 'next/router'
 import { useGlobal } from './_app'
 
+const { Search } = Input
+
 export default function Application(props) {
-  const user = useGlobal()
-  console.log('----------', user)
   const [drawerVisible, setDrawerVisible] = useState(false)
 
   const onFinish = values => {
@@ -160,9 +160,27 @@ export default function Application(props) {
     }
   ]
 
+  async function onSearch(value) {
+    const result = await get('/api/search-applications', {
+      params: {
+        qs: value
+      }
+    })
+    if (result) {
+      setData(result)
+    }
+  }
+
   return (
     <div className="page-application">
       <div className="header-container">
+        <Search
+          placeholder="应用的名称、应用ID、Git地址"
+          enterButton
+          style={{ width: 300, marginRight: 20 }}
+          onSearch={onSearch}
+          allowClear
+        />
         <Checkbox onChange={handleCheck}>我的收藏</Checkbox>
         <Button type="primary" onClick={() => setDrawerVisible(true)}>
           创建应用
@@ -248,6 +266,9 @@ export default function Application(props) {
         </Form>
       </Drawer>
       <style jsx global>{`
+        .page-application .header-container {
+          margin-bottom: 30px;
+        }
         .application-drawer .btn-group {
           border-top: 1px solid #e9e9e9;
           padding-top: 10px;

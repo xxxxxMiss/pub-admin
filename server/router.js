@@ -18,6 +18,7 @@ module.exports = router => {
     application.createApplication
   )
   router.get('/api/get-applications', checkLogin, application.getList)
+  router.get('/api/search-applications', checkLogin, application.search)
   router.post('/api/collect-application', checkLogin, user.collectApplication)
   router.get('/api/get-userinfo', checkLogin, user.getUserInfo)
   router.get(

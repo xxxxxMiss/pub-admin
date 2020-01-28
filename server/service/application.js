@@ -38,3 +38,16 @@ exports.getCountByQuery = (query = {}) => {
 exports.getApplicationById = id => {
   return Application.findById(id)
 }
+
+exports.search = qs => {
+  if (/^\d+$/.test(qs)) {
+    return Application.find({ appid: qs }).exec()
+  }
+
+  return Application.find({
+    $or: [
+      { appName: { $regex: qs, $options: 'im' } },
+      { appGitAddr: { $regex: qs, $options: 'im' } }
+    ]
+  }).exec()
+}
