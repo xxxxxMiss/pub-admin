@@ -5,6 +5,7 @@ const lessToJS = require('less-vars-to-js')
 const withCss = require('@zeit/next-css')
 const fs = require('fs')
 const path = require('path')
+const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin')
 
 // Where your antd-custom.less file lives
 const themeVariables = lessToJS(
@@ -45,6 +46,7 @@ module.exports = {
           '@hooks': path.join(__dirname, 'assets/hooks'),
           '@components': path.join(__dirname, 'components')
         }
+        config.plugins.push(new AntdDayjsWebpackPlugin())
         return config
       }
     })

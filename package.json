@@ -55,6 +55,7 @@
     "socket.io-client": "^2.3.0"
   },
   "devDependencies": {
+    "antd-dayjs-webpack-plugin": "^0.0.8",
     "koa-logger": "^3.2.1",
     "link-module-alias": "^1.2.0",
     "nodemon": "^2.0.2"
