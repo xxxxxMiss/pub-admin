@@ -27,62 +27,9 @@ import {
 } from '@ant-design/icons'
 import { versionJoiSchema } from '@js/validation'
 
+const Column = Table.Column
+
 export default function Version(props) {
-  const columns = [
-    {
-      title: '版本号',
-      dataIndex: 'version',
-      width: '18%',
-      className: 'wrap-column'
-    },
-    {
-      title: '版本名称',
-      dataIndex: 'name',
-      width: '18%',
-      className: 'wrap-column'
-    },
-    {
-      title: '编译状态',
-      dataIndex: 'status',
-      width: '28%',
-      render(text, record) {
-        const status = record.status
-        return (
-          <Row gutter={15}>
-            {status.map((s, i) => (
-              <Col key={i}>
-                <p>{i === 0 ? 'FAT' : i === 1 ? 'UAT' : 'PRO'}</p>
-                {s === 'building' ? (
-                  <LoadingOutlined />
-                ) : s === 'success' ? (
-                  <CheckOutlined />
-                ) : s === 'aborted' ? (
-                  <PauseOutlined />
-                ) : s === 'empty' ? (
-                  '-'
-                ) : (
-                  <WarningOutlined />
-                )}
-              </Col>
-            ))}
-          </Row>
-        )
-      }
-    },
-    {
-      title: 'FAT',
-      dataIndex: 'FAT',
-      width: '20%',
-      render() {
-        return <CheckCircleTwoTone />
-      }
-    },
-    {
-      title: '创建人',
-      dataIndex: ['publisher', 'name'],
-      key: 'publisher'
-    }
-  ]
   const router = useRouter()
   const [form] = Form.useForm()
 
@@ -192,10 +139,56 @@ export default function Version(props) {
             rowClassName={(_, index) => {
               return currentIndex === index ? 'row-selected' : ''
             }}
-            columns={columns}
             dataSource={data}
             // scroll={{ y: 500 }}
-          ></Table>
+          >
+            <Column
+              title="版本号"
+              dataIndex="version"
+              width="18%"
+              className="wrap-column"
+            />
+            <Column
+              title="版本名称"
+              dataIndex="name"
+              width="18%"
+              className="wrap-column"
+            />
+            <Column
+              title="版本状态"
+              dataIndex="status"
+              width="28%"
+              render={(_, record) => {
+                const status = record.status
+                return (
+                  <Row gutter={15}>
+                    {status.map((s, i) => (
+                      <Col key={i}>
+                        <p>{i === 0 ? 'FAT' : i === 1 ? 'UAT' : 'PRO'}</p>
+                        {s === 'building' ? (
+                          <LoadingOutlined />
+                        ) : s === 'success' ? (
+                          <CheckOutlined />
+                        ) : s === 'aborted' ? (
+                          <PauseOutlined />
+                        ) : s === 'empty' ? (
+                          '-'
+                        ) : (
+                          <WarningOutlined />
+                        )}
+                      </Col>
+                    ))}
+                  </Row>
+                )
+              }}
+            />
+            <Column
+              title="FAT"
+              dataIndex="FAT"
+              render={() => <CheckCircleTwoTone />}
+            />
+            <Column title="创建人" dataIndex={['publisher', 'name']} />
+          </Table>
         </Col>
         <Col span={10}>
           {data.length > 0 && (

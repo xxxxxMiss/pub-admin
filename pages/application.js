@@ -18,6 +18,7 @@ import { useRouter } from 'next/router'
 import { useGlobal } from './_app'
 
 const { Search } = Input
+const Column = Table.Column
 
 export default function Application(props) {
   const [drawerVisible, setDrawerVisible] = useState(false)
@@ -79,86 +80,6 @@ export default function Application(props) {
       getData(pagination)
     }
   }
-  const columns = [
-    {
-      title: '应用ID',
-      dataIndex: 'appid',
-      sorter: true,
-      width: '20%',
-      render: (text, record) => {
-        return (
-          <>
-            {record.isCollected ? (
-              <IconFont
-                type={'iconcollect_filled'}
-                onClick={() => {
-                  handleCollection(record._id)
-                }}
-              />
-            ) : (
-              <IconFont
-                type={'iconcollect_outlined'}
-                onClick={() => {
-                  handleCollection(record._id)
-                }}
-              />
-            )}
-            <CopyToClipboard
-              onCopy={() => message.success('复制成功')}
-              text={text}
-            >
-              <span>
-                {text}
-                <CopyOutlined />
-              </span>
-            </CopyToClipboard>
-          </>
-        )
-      }
-    },
-    {
-      title: '应用名称',
-      dataIndex: 'appName',
-      sorter: true,
-      width: '20%',
-      render: text => {
-        return (
-          <CopyToClipboard
-            onCopy={() => message.success('复制成功')}
-            text={text}
-          >
-            <span>
-              {text}
-              <CopyOutlined />
-            </span>
-          </CopyToClipboard>
-        )
-      }
-    },
-    {
-      title: 'Git地址',
-      dataIndex: 'appGitAddr',
-      sorter: true,
-      render: text => {
-        return (
-          <CopyToClipboard
-            onCopy={() => message.success('复制成功')}
-            text={text}
-          >
-            <span>
-              {text}
-              <CopyOutlined />
-            </span>
-          </CopyToClipboard>
-        )
-      }
-    },
-    {
-      title: '应用语言',
-      dataIndex: 'appLanguage',
-      width: '20%'
-    }
-  ]
 
   async function onSearch(value) {
     const result = await get('/api/search-applications', {
@@ -187,7 +108,6 @@ export default function Application(props) {
         </Button>
       </div>
       <Table
-        columns={columns}
         rowKey={record => record._id}
         dataSource={data}
         pagination={{
@@ -214,7 +134,83 @@ export default function Application(props) {
             }
           }
         }}
-      />
+      >
+        <Column
+          title="应用ID"
+          dataIndex="appid"
+          width="20%"
+          sorter
+          render={(text, record) => {
+            return (
+              <>
+                {record.isCollected ? (
+                  <IconFont
+                    type={'iconcollect_filled'}
+                    onClick={() => {
+                      handleCollection(record._id)
+                    }}
+                  />
+                ) : (
+                  <IconFont
+                    type={'iconcollect_outlined'}
+                    onClick={() => {
+                      handleCollection(record._id)
+                    }}
+                  />
+                )}
+                <span>
+                  {text}
+                  <CopyToClipboard
+                    onCopy={() => message.success('复制成功')}
+                    text={text}
+                  >
+                    <CopyOutlined />
+                  </CopyToClipboard>
+                </span>
+              </>
+            )
+          }}
+        />
+        <Column
+          title="应用名称"
+          sorter
+          dataIndex="appName"
+          width="20%"
+          render={text => {
+            return (
+              <span>
+                {text}
+                <CopyToClipboard
+                  onCopy={() => message.success('复制成功')}
+                  text={text}
+                >
+                  <CopyOutlined />
+                </CopyToClipboard>
+              </span>
+            )
+          }}
+        />
+        <Column
+          title="Git地址"
+          sorter
+          dataIndex="appGitAddr"
+          width="20%"
+          render={text => {
+            return (
+              <span>
+                {text}
+                <CopyToClipboard
+                  onCopy={() => message.success('复制成功')}
+                  text={text}
+                >
+                  <CopyOutlined />
+                </CopyToClipboard>
+              </span>
+            )
+          }}
+        />
+        <Column title="应用语言" dataIndex="appLanguage" width="20%" />
+      </Table>
       <Drawer
         width={720}
         className="application-drawer"
@@ -268,6 +264,13 @@ export default function Application(props) {
       <style jsx global>{`
         .page-application .header-container {
           margin-bottom: 30px;
+        }
+        .page-application .anticon-custome {
+          padding-right: 10px;
+        }
+        .page-application .anticon-copy {
+          padding-left: 10px;
+          font-size: 16px;
         }
         .application-drawer .btn-group {
           border-top: 1px solid #e9e9e9;
