@@ -8,7 +8,8 @@ import {
   Select,
   Cascader,
   message,
-  Table
+  Table,
+  DatePicker
 } from 'antd'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
@@ -28,6 +29,8 @@ import {
 import { versionJoiSchema } from '@js/validation'
 
 const Column = Table.Column
+const { RangePicker } = DatePicker
+const { Search } = Input
 
 export default function Version(props) {
   const router = useRouter()
@@ -114,14 +117,37 @@ export default function Version(props) {
         }
       }).then(list => {
         setData(list)
+        const least = list?.[0]?.status || []
+        if (least.includes('aborted') || least.slice(-1)[0] != 'empty') {
+          clearInterval(interval)
+        }
       })
     }, 4000)
     return () => clearInterval(interval)
   }, [])
 
+  async function onSearch(keyword) {
+    const result = await get('/api/search-version', {
+      params: {
+        qs: keyword
+      }
+    })
+    if (result) {
+      setData(result)
+    }
+  }
+
   return (
     <div className="page-version">
       <div className="header-container">
+        <RangePicker />
+        <Search
+          allowClear
+          enterButton
+          placeholder="请输入关键字"
+          style={{ width: 250, margin: '0 15px' }}
+          onSearch={onSearch}
+        />
         <Button type="primary" onClick={addNewVersion}>
           新增版本
         </Button>
@@ -278,6 +304,9 @@ export default function Version(props) {
         </Form>
       </Drawer>
       <style jsx global>{`
+        .page-version .header-container {
+          margin-bottom: 30px;
+        }
         .page-version .wrap-column {
           word-break: break-all;
         }

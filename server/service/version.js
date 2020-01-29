@@ -1,5 +1,4 @@
 const Version = require('../models/version')
-const buildPackage = require('~js/build-command')
 
 exports.createNewVersion = params => {
   return Version.create(params)
@@ -38,4 +37,31 @@ exports.getPkgList = params => {
   return Version.find({ appid }, null, options)
     .populate('publisher', ['name'])
     .exec()
+}
+
+exports.search = params => {
+  const { start, end, qs } = params
+
+  return Version.find({
+    $or: [
+      {
+        createAt: {
+          $lte: end,
+          $gte: start
+        }
+      },
+      {
+        version: {
+          $regex: qs,
+          $options: 'im'
+        }
+      },
+      {
+        name: {
+          $regex: qs,
+          $options: 'im'
+        }
+      }
+    ]
+  }).exec()
 }

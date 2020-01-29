@@ -154,3 +154,11 @@ exports.abortBuild = async ctx => {
   })
   buildEvent.emit('build:abort')
 }
+
+exports.search = async ctx => {
+  const result = await versionService.search(ctx.query)
+  ctx.body = {
+    code: 0,
+    data: result || []
+  }
+}
