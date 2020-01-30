@@ -16,6 +16,9 @@ import Router from 'next/router'
 import request, { post } from '@js/request'
 import NProgress from 'nprogress'
 import zhCN from 'antd/lib/locale/zh_CN'
+import 'dayjs/locale/zh-cn'
+import dayjs from 'dayjs'
+dayjs.locale('zh-cn')
 
 // import io from 'socket.io-client'/
 

@@ -1,4 +1,5 @@
 const Version = require('../models/version')
+const dayjs = require('dayjs')
 
 exports.createNewVersion = params => {
   return Version.create(params)
@@ -40,28 +41,37 @@ exports.getPkgList = params => {
 }
 
 exports.search = params => {
-  const { start, end, qs } = params
-
-  return Version.find({
-    $or: [
-      {
-        createAt: {
-          $lte: end,
-          $gte: start
-        }
-      },
-      {
-        version: {
-          $regex: qs,
-          $options: 'im'
-        }
-      },
-      {
-        name: {
-          $regex: qs,
-          $options: 'im'
-        }
+  let { start, end, qs, appid } = params
+  const $or = []
+  if (qs) {
+    $or.push({
+      version: {
+        $regex: qs,
+        $options: 'imx'
       }
-    ]
-  }).exec()
+    })
+    $or.push({
+      name: {
+        $regex: qs,
+        $options: 'imx'
+      }
+    })
+  }
+  if (start || end) {
+    start = dayjs(start).toISOString()
+    end = dayjs(end).toISOString()
+    $or.push({
+      createAt: {
+        $lte: end,
+        $gte: start
+      }
+    })
+  }
+
+  const query = { appid }
+  if ($or.length > 0) {
+    query.$or = $or
+  }
+
+  return Version.find(query).exec()
 }

@@ -126,10 +126,13 @@ export default function Version(props) {
     return () => clearInterval(interval)
   }, [])
 
-  async function onSearch(keyword) {
+  async function onSearch({ keyword, start, end }) {
     const result = await get('/api/search-version', {
       params: {
-        qs: keyword
+        qs: keyword,
+        start,
+        end,
+        appid: router.query.appid
       }
     })
     if (result) {
@@ -140,13 +143,13 @@ export default function Version(props) {
   return (
     <div className="page-version">
       <div className="header-container">
-        <RangePicker />
+        <RangePicker onChange={(_, [start, end]) => onSearch({ start, end })} />
         <Search
           allowClear
           enterButton
           placeholder="请输入关键字"
           style={{ width: 250, margin: '0 15px' }}
-          onSearch={onSearch}
+          onSearch={keyword => onSearch({ keyword })}
         />
         <Button type="primary" onClick={addNewVersion}>
           新增版本
