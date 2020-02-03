@@ -44,7 +44,8 @@ module.exports = {
           ...config.resolve.alias,
           '@js': path.join(__dirname, 'assets/js'),
           '@hooks': path.join(__dirname, 'assets/hooks'),
-          '@components': path.join(__dirname, 'components')
+          '@components': path.join(__dirname, 'components'),
+          '@aplo': path.join(__dirname, 'apollo')
         }
         config.plugins.push(new AntdDayjsWebpackPlugin())
         return config

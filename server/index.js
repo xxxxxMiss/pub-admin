@@ -1,11 +1,12 @@
 const next = require('next')
 const Koa = require('koa')
 const app = new Koa()
-const server = require('http').createServer(app.callback())
+// const server = require('http').createServer(app.callback())
 const Router = require('koa-router')
 const bodyParser = require('koa-bodyparser')
 const session = require('koa-session')
 const MongooseStore = require('koa-session-mongoose')
+const { ApolloServer, gql } = require('apollo-server-koa')
 
 const logger = require('./middlewares/logger')
 const config = require('../config')
@@ -17,7 +18,20 @@ const handle = nextApp.getRequestHandler()
 const dispatchRouter = require('./router')
 const connectMongo = require('./mongoose')
 
-require('../assets/js/create-socket-server')(server)
+const typeDefs = require('./apollo/schema')
+const resolvers = require('./apollo/resolvers')
+const userModel = require('./models/user')
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  dataSources: () => {
+    return {
+      userAPI: new userAPI({ store: userModel })
+    }
+  }
+})
+
+server.applyMiddleware({ app })
 
 app.config = config
 nextApp.prepare().then(() => {
@@ -55,8 +69,8 @@ nextApp.prepare().then(() => {
     // TODO: use sentry to collect error info
   })
 
-  server.listen(port, () => {
-    logger.info('> Ready on http://localhost:' + port)
+  app.listen(port, () => {
+    logger.info('> Ready on http://localhost:' + port, server.graphqlPath)
   })
   connectMongo()
 })

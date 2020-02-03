@@ -16,11 +16,24 @@ import { IconFont } from '@components'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { useRouter } from 'next/router'
 import { useGlobal } from './_app'
+import { withApollo } from '@aplo/client'
+import gql from 'graphql-tag'
+import { useQuery } from '@apollo/react-hooks'
 
 const { Search } = Input
 const Column = Table.Column
 
-export default function Application(props) {
+const ViewerQuery = gql`
+  query ViewerQuery {
+    viewer {
+      id
+      name
+      status
+    }
+  }
+`
+
+function Application(props) {
   const [drawerVisible, setDrawerVisible] = useState(false)
 
   const onFinish = values => {
@@ -32,6 +45,10 @@ export default function Application(props) {
       }
     })
   }
+
+  const {
+    data: { viewer }
+  } = useQuery(ViewerQuery)
 
   const [data, setData] = useState(props.data || [])
   const [pagination, setPagination] = useState(props.pagination)
@@ -298,3 +315,5 @@ Application.getInitialProps = async ctx => {
     pagination
   }
 }
+
+export default withApollo(Application)
