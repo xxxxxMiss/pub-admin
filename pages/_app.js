@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons'
 
 import App from 'next/app'
+import { withApollo } from '@aplo/client'
 import React, { useContext } from 'react'
 import Router from 'next/router'
 import request, { post } from '@js/request'
@@ -19,8 +20,6 @@ import zhCN from 'antd/lib/locale/zh_CN'
 import 'dayjs/locale/zh-cn'
 import dayjs from 'dayjs'
 dayjs.locale('zh-cn')
-
-// import io from 'socket.io-client'/
 
 const { SubMenu } = Menu
 const { Header, Content, Sider } = Layout
@@ -55,20 +54,8 @@ class MyApp extends App {
   }
 
   state = {
-    collapsed: false,
-    socket: null
+    collapsed: false
   }
-
-  // componentDidMount() {
-  //   const socket = io()
-  //   this.setState({
-  //     socket
-  //   })
-  // }
-
-  // componentWillUnmount() {
-  //   this.state.socket.close()
-  // }
 
   logout = async () => {
     const res = await post('/api/logout')
@@ -167,7 +154,7 @@ class MyApp extends App {
                     minHeight: 280
                   }}
                 >
-                  <Component {...pageProps} socket={this.state.socket} />
+                  <Component {...pageProps} />
                 </Content>
               </Layout>
             </Layout>
@@ -189,4 +176,4 @@ class MyApp extends App {
   }
 }
 
-export default MyApp
+export default withApollo(MyApp)

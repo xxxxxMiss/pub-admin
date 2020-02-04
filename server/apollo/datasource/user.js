@@ -30,7 +30,14 @@ class UserAPI extends DataSource {
     return users && users[0] ? users[0] : null
   }
   async register(params) {
-    return this.store.user.register(params)
+    const { name, password } = params
+    const user = new this.store()
+    user.name = name
+    user.password = password
+    return user.save()
+  }
+  async getUserInfo({ name }) {
+    return this.store.findOne({ name }).exec()
   }
 }
 

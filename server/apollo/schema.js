@@ -2,7 +2,8 @@ const gql = require('graphql-tag')
 
 const typeDefs = gql`
   type Query {
-    me: User
+    application: [Application]!
+    me(name: String!): User
   }
   type Mutation {
     register(name: String!, password: String!): User

@@ -1,12 +1,11 @@
 const next = require('next')
 const Koa = require('koa')
 const app = new Koa()
-// const server = require('http').createServer(app.callback())
 const Router = require('koa-router')
 const bodyParser = require('koa-bodyparser')
 const session = require('koa-session')
 const MongooseStore = require('koa-session-mongoose')
-const { ApolloServer, gql } = require('apollo-server-koa')
+const { ApolloServer } = require('apollo-server-koa')
 
 const logger = require('./middlewares/logger')
 const config = require('../config')
@@ -21,17 +20,21 @@ const connectMongo = require('./mongoose')
 const typeDefs = require('./apollo/schema')
 const resolvers = require('./apollo/resolvers')
 const userModel = require('./models/user')
+const UserAPI = require('./apollo/datasource/user')
+const ApplicationAPI = require('./apollo/datasource/application')
+const applicationModel = require('./models/application')
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   dataSources: () => {
     return {
-      userAPI: new userAPI({ store: userModel })
+      userAPI: new UserAPI({ store: userModel }),
+      applicationAPI: new ApplicationAPI({ store: applicationModel })
     }
   }
 })
 
-server.applyMiddleware({ app })
+server.applyMiddleware({ app, path: '/api/graphql' })
 
 app.config = config
 nextApp.prepare().then(() => {
