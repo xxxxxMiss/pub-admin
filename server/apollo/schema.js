@@ -2,7 +2,7 @@ const gql = require('graphql-tag')
 
 const typeDefs = gql`
   type Query {
-    application: [Application]!
+    application(page: Int!, pageSize: Int!): ApplicationList
     me(name: String!): User
   }
   type Mutation {
@@ -37,6 +37,26 @@ const typeDefs = gql`
     appid: Int!
     status: [String!]!
     publisher: User!
+  }
+  interface PageInfo {
+    total: Int!
+    page: Int!
+    pageSize: Int!
+    hasNextPage: Boolean!
+  }
+  type VersionList implements PageInfo {
+    list: [Version]!
+    total: Int!
+    page: Int!
+    pageSize: Int!
+    hasNextPage: Boolean!
+  }
+  type ApplicationList implements PageInfo {
+    list: [Application]!
+    total: Int!
+    page: Int!
+    pageSize: Int!
+    hasNextPage: Boolean!
   }
 `
 module.exports = typeDefs

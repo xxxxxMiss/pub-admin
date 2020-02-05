@@ -1,7 +1,7 @@
 module.exports = {
   Query: {
-    application: async (_, __, { dataSources }) => {
-      return await dataSources.applicationAPI.getList()
+    application: async (_, { page, pageSize }, { dataSources }) => {
+      return await dataSources.applicationAPI.getList({ page, pageSize })
     },
     me: async (_, { name }, { dataSources }) => {
       const user = await dataSources.userAPI.getUserInfo({ name })

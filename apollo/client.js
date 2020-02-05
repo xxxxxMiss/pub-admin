@@ -57,7 +57,6 @@ export function withApollo(PageComponent, { ssr = true } = {}) {
         if (ctx.res && ctx.res.finished) {
           return pageProps
         }
-
         // Only if ssr is enabled
         if (ssr) {
           try {

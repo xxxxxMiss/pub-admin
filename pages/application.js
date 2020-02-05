@@ -23,11 +23,18 @@ const { Search } = Input
 const Column = Table.Column
 
 const GET_APPLICATIONS = gql`
-  query get_applications {
-    application {
-      appName
-      appDesc
-      appGitAddr
+  query get_applications($page: Int!, $pageSize: Int!) {
+    application(page: $page, pageSize: $pageSize) {
+      list {
+        appName
+        appDesc
+        appGitAddr
+        appid
+        appLanguage
+      }
+      total
+      page
+      pageSize
     }
   }
 `
@@ -40,26 +47,30 @@ function Application(props) {
       if (res) {
         message.success('创建成功')
         setDrawerVisible(false)
-        getData()
+        // getData()
       }
     })
   }
 
-  const { data: testData } = useQuery(GET_APPLICATIONS)
-  console.log('-------', testData)
+  const { data, loading, fetchMore } = useQuery(GET_APPLICATIONS, {
+    variables: { page: 1, pageSize: 1 }
+  })
 
-  const [data, setData] = useState(props.data || [])
-  const [pagination, setPagination] = useState(props.pagination)
+  // const [data, setData] = useState(props.data || [])
+  const [pagination, setPagination] = useState(() => {
+    const { list: _, ...pageInfo } = data?.application || {}
+    return pageInfo
+  })
 
-  function getData(params) {
-    get('api/get-applications', {
-      params
-    }).then(res => {
-      if (res) {
-        setData(res.list)
-      }
-    })
-  }
+  // function getData(params) {
+  //   get('api/get-applications', {
+  //     params
+  //   }).then(res => {
+  //     if (res) {
+  //       setData(res.list)
+  //     }
+  //   })
+  // }
 
   function handleTableChange(paginationCfg, _, sorter) {
     console.log('=====', sorter)
@@ -73,13 +84,13 @@ function Application(props) {
       params.sortField = sorter.field
       params.sortOrder = sorter.order
     }
-    getData(params)
+    // getData(params)
   }
 
   function handleCheck(e) {
-    getData({
-      collect: e.target.checked
-    })
+    // getData({
+    //   collect: e.target.checked
+    // })
   }
   const router = useRouter()
 
@@ -92,7 +103,7 @@ function Application(props) {
       //   prev.appid = res.isCollected
       //   return prev
       // })
-      getData(pagination)
+      // getData(pagination)
     }
   }
 
@@ -124,12 +135,20 @@ function Application(props) {
       </div>
       <Table
         rowKey={record => record._id}
-        dataSource={data}
+        dataSource={data?.application?.list || []}
         pagination={{
           ...pagination,
           showSizeChanger: true,
           showQuickJumper: true,
-          hideOnSinglePage: true
+          hideOnSinglePage: true,
+          onChange: (page, pageSize) => {
+            fetchMore({
+              variables: { page, pageSize },
+              updateQuery: (_, { fetchMoreResult }) => {
+                return fetchMoreResult
+              }
+            })
+          }
         }}
         onChange={handleTableChange}
         onRow={record => {
@@ -300,18 +319,18 @@ function Application(props) {
     </div>
   )
 }
-Application.getInitialProps = async ctx => {
-  const { list = [], ...pagination } =
-    (await request(ctx).get('/api/get-applications', {
-      params: {
-        pageSize: 2,
-        page: 1
-      }
-    })) || {}
-  return {
-    data: list,
-    pagination
-  }
-}
+// Application.getInitialProps = async ctx => {
+//   const { list = [], ...pagination } =
+//     (await request(ctx).get('/api/get-applications', {
+//       params: {
+//         pageSize: 2,
+//         page: 1
+//       }
+//     })) || {}
+//   return {
+//     data: list,
+//     pagination
+//   }
+// }
 
 export default withApollo(Application)

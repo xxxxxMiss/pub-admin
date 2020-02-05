@@ -16,8 +16,23 @@ class ApplicationAPI extends DataSource {
     this.context = config.context
   }
 
-  async getList() {
-    return this.store.find({}).exec()
+  async getList({ page, pageSize }) {
+    const skip = (page - 1) * pageSize
+    const options = {
+      skip,
+      limit: pageSize
+    }
+    const result = await this.store.find({}, null, options).exec()
+    const count = await this.store.countDocuments()
+    const pages = Math.ceil(count / pageSize)
+    const hasNextPage = page < pages
+    return {
+      list: result,
+      page,
+      pageSize,
+      total: count,
+      hasNextPage
+    }
   }
 }
 
